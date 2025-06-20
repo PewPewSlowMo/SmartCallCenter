@@ -315,3 +315,5 @@ test_plan:
 agent_communication:
   - agent: "testing"
     message: "Completed comprehensive testing of all backend API endpoints. All tests passed successfully. The server is running correctly on port 8001, MongoDB connection is working, all endpoints respond correctly, and CORS is properly configured. No errors were found in the server logs."
+  - agent: "testing"
+    message: "Starting testing of the updated backend API for the call center. Will test all endpoints including authentication, dashboard, admin, operators, and queues endpoints."
