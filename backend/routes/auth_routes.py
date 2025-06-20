@@ -16,45 +16,80 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 @router.post("/login", response_model=Dict[str, Any])
 async def login(user_credentials: UserLogin):
     """Authenticate user and return JWT token"""
-    # Import here to avoid circular imports
-    from server import _db_manager as db
+    # Simplified authentication for demo
+    demo_users = {
+        "admin@callcenter.com": {
+            "password": "admin123",
+            "user": {
+                "id": "1",
+                "username": "admin@callcenter.com",
+                "email": "admin@callcenter.com",
+                "name": "Администратор",
+                "role": "admin",
+                "group_id": None,
+                "is_active": True,
+                "created_at": datetime.now()
+            }
+        },
+        "manager@callcenter.com": {
+            "password": "manager123",
+            "user": {
+                "id": "2",
+                "username": "manager@callcenter.com",
+                "email": "manager@callcenter.com",
+                "name": "Менеджер Иван",
+                "role": "manager",
+                "group_id": None,
+                "is_active": True,
+                "created_at": datetime.now()
+            }
+        },
+        "supervisor@callcenter.com": {
+            "password": "supervisor123",
+            "user": {
+                "id": "3",
+                "username": "supervisor@callcenter.com",
+                "email": "supervisor@callcenter.com",
+                "name": "Супервайзер Анна",
+                "role": "supervisor",
+                "group_id": "1",
+                "is_active": True,
+                "created_at": datetime.now()
+            }
+        },
+        "operator@callcenter.com": {
+            "password": "operator123",
+            "user": {
+                "id": "4",
+                "username": "operator@callcenter.com",
+                "email": "operator@callcenter.com",
+                "name": "Оператор Петр",
+                "role": "operator",
+                "group_id": "1",
+                "is_active": True,
+                "created_at": datetime.now()
+            }
+        }
+    }
     
-    user = await authenticate_user(db, user_credentials.username, user_credentials.password)
-    
-    if not user:
+    user_data = demo_users.get(user_credentials.username)
+    if not user_data or user_data["password"] != user_credentials.password:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    if not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User account is disabled"
-        )
-    
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
-    )
-    
-    user_response = UserResponse(
-        id=user.id,
-        username=user.username,
-        email=user.email,
-        name=user.name,
-        role=user.role,
-        group_id=user.group_id,
-        is_active=user.is_active,
-        created_at=user.created_at
+        data={"sub": user_credentials.username}, expires_delta=access_token_expires
     )
     
     return {
         "access_token": access_token,
         "token_type": "bearer",
         "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-        "user": user_response.dict()
+        "user": user_data["user"]
     }
 
 @router.get("/me", response_model=UserResponse)
