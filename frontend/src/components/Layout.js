@@ -131,8 +131,8 @@ const Layout = () => {
                 <BarChart3 className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-slate-900 dark:text-white">CallCenter</h1>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Analytics</p>
+                <h1 className="text-lg font-bold text-slate-900 dark:text-white">Smart Колл</h1>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Центр</p>
               </div>
             </div>
             <Button
