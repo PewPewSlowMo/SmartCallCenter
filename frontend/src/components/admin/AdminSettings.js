@@ -157,7 +157,7 @@ const AdminSettings = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Настройки системы
+            Smart Колл Центр
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-1">
             Конфигурация интеграции с Asterisk и системных параметров
