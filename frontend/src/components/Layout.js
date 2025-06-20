@@ -38,50 +38,7 @@ const Layout = () => {
     document.documentElement.classList.toggle('dark');
   };
 
-  const menuItems = [
-    {
-      path: '/dashboard',
-      icon: Home,
-      label: 'Дашборд',
-      roles: ['admin', 'manager', 'supervisor', 'operator']
-    },
-    {
-      path: '/operator',
-      icon: Headphones,
-      label: 'Рабочее место',
-      roles: ['operator']
-    },
-    {
-      path: '/reports/operators',
-      icon: Users,
-      label: 'Отчеты по операторам',
-      roles: ['admin', 'manager', 'supervisor']
-    },
-    {
-      path: '/reports/queues',
-      icon: Phone,
-      label: 'Отчеты по очередям',
-      roles: ['admin', 'manager', 'supervisor']
-    },
-    {
-      path: '/reports/missed-calls',
-      icon: Clock,
-      label: 'Пропущенные звонки',
-      roles: ['admin', 'manager', 'supervisor']
-    },
-    {
-      path: '/analytics',
-      icon: TrendingUp,
-      label: 'Аналитика',
-      roles: ['admin', 'manager']
-    },
-    {
-      path: '/admin',
-      icon: Settings,
-      label: 'Администрирование',
-      roles: ['admin']
-    }
-  ];
+
 
   const filteredMenuItems = menuItems.filter(item => 
     item.roles.includes(user?.role)
