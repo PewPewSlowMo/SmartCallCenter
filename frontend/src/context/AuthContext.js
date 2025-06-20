@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { mockUsers } from '../mock/mockData';
+import { authAPI } from '../services/api';
 
 const AuthContext = createContext();
 
@@ -16,36 +16,68 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for saved session
-    const savedUser = localStorage.getItem('callcenter_user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    setLoading(false);
+    checkAuthStatus();
   }, []);
 
-  const login = async (username, password) => {
+  const checkAuthStatus = async () => {
     try {
-      const foundUser = mockUsers.find(
-        u => u.username === username && u.password === password
-      );
+      const token = localStorage.getItem('callcenter_token');
+      const savedUser = localStorage.getItem('callcenter_user');
       
-      if (foundUser) {
-        const { password: _, ...userWithoutPassword } = foundUser;
-        setUser(userWithoutPassword);
-        localStorage.setItem('callcenter_user', JSON.stringify(userWithoutPassword));
-        return { success: true };
-      } else {
-        return { success: false, error: 'Неверные учетные данные' };
+      if (token && savedUser) {
+        // Verify token with backend
+        const result = await authAPI.getCurrentUser();
+        if (result.success) {
+          setUser(result.data);
+        } else {
+          // Token invalid, clear storage
+          localStorage.removeItem('callcenter_token');
+          localStorage.removeItem('callcenter_user');
+        }
       }
     } catch (error) {
-      return { success: false, error: 'Ошибка входа в систему' };
+      console.error('Auth check failed:', error);
+      localStorage.removeItem('callcenter_token');
+      localStorage.removeItem('callcenter_user');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('callcenter_user');
+  const login = async (username, password) => {
+    try {
+      setLoading(true);
+      const result = await authAPI.login(username, password);
+      
+      if (result.success) {
+        const { access_token, user: userData } = result.data;
+        
+        // Store token and user data
+        localStorage.setItem('callcenter_token', access_token);
+        localStorage.setItem('callcenter_user', JSON.stringify(userData));
+        
+        setUser(userData);
+        return { success: true };
+      } else {
+        return { success: false, error: result.error };
+      }
+    } catch (error) {
+      return { success: false, error: 'Ошибка входа в систему' };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await authAPI.logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setUser(null);
+      localStorage.removeItem('callcenter_token');
+      localStorage.removeItem('callcenter_user');
+    }
   };
 
   const hasPermission = (requiredRole) => {
@@ -64,7 +96,7 @@ export const AuthProvider = ({ children }) => {
   const canViewGroup = (groupId) => {
     if (!user) return false;
     if (user.role === 'admin' || user.role === 'manager') return true;
-    if (user.role === 'supervisor') return user.groupId === groupId;
+    if (user.role === 'supervisor') return user.group_id === groupId;
     return false;
   };
 
@@ -72,8 +104,8 @@ export const AuthProvider = ({ children }) => {
     if (!user) return false;
     if (user.role === 'admin' || user.role === 'manager') return true;
     if (user.role === 'supervisor') {
-      // Check if operator belongs to supervisor's group
-      return true; // Mock implementation
+      // Would need to check if operator belongs to supervisor's group
+      return true; // Simplified for now
     }
     if (user.role === 'operator') return user.id === operatorId;
     return false;
@@ -86,7 +118,8 @@ export const AuthProvider = ({ children }) => {
     logout,
     hasPermission,
     canViewGroup,
-    canViewOperator
+    canViewOperator,
+    checkAuthStatus
   };
 
   return (
