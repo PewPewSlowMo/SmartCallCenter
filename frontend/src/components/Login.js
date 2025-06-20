@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/button';
@@ -142,6 +142,7 @@ const Login = () => {
                   size="sm"
                   onClick={() => handleDemoLogin('admin')}
                   className="text-xs"
+                  disabled={loading}
                 >
                   Администратор
                 </Button>
@@ -150,6 +151,7 @@ const Login = () => {
                   size="sm"
                   onClick={() => handleDemoLogin('manager')}
                   className="text-xs"
+                  disabled={loading}
                 >
                   Менеджер
                 </Button>
@@ -158,6 +160,7 @@ const Login = () => {
                   size="sm"
                   onClick={() => handleDemoLogin('supervisor')}
                   className="text-xs"
+                  disabled={loading}
                 >
                   Супервайзер
                 </Button>
@@ -166,6 +169,7 @@ const Login = () => {
                   size="sm"
                   onClick={() => handleDemoLogin('operator')}
                   className="text-xs"
+                  disabled={loading}
                 >
                   Оператор
                 </Button>
