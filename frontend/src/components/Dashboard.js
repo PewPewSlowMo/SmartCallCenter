@@ -18,8 +18,19 @@ import {
   Calendar,
   Filter,
   Download,
-  RefreshCw
+  RefreshCw,
+  BarChart3
 } from 'lucide-react';
+import { 
+  ResponsiveContainer, 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend 
+} from 'recharts';
 import { mockCalls, calculateKPIs, generateChartData, mockOperators, mockGroups } from '../mock/mockData';
 
 const Dashboard = () => {
