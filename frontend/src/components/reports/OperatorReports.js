@@ -18,7 +18,7 @@ import {
   XCircle,
   Filter
 } from 'lucide-react';
-import { generateOperatorReport, mockGroups } from '../../mock/mockData';
+import { generateOperatorReport, mockGroups, mockCalls } from '../../mock/mockData';
 
 const OperatorReports = () => {
   const { user, hasPermission } = useAuth();
