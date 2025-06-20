@@ -69,12 +69,20 @@ api_router = APIRouter(prefix="/api")
 async def get_database() -> DatabaseManager:
     return db_manager
 
-# Add database dependency to all routers
-def setup_router_dependencies():
-    """Setup database dependency for all routers"""
-    for router in [auth_router, call_router, operator_router, queue_router, admin_router, dashboard_router]:
-        # Update the dependency overrides
-        router.dependencies.append(Depends(get_database))
+# Setup router dependencies
+auth_router.dependencies = []
+call_router.dependencies = []
+operator_router.dependencies = []
+queue_router.dependencies = []
+admin_router.dependencies = []
+dashboard_router.dependencies = []
+
+# Override dependencies for all routers
+def override_get_database():
+    return db_manager
+
+# Apply dependency override to FastAPI app
+app.dependency_overrides[DatabaseManager] = override_get_database
 
 # Health check endpoints
 @api_router.get("/")
