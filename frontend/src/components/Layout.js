@@ -45,6 +45,12 @@ const Layout = () => {
       roles: ['admin', 'manager', 'supervisor', 'operator']
     },
     {
+      path: '/operator',
+      icon: Headphones,
+      label: 'Рабочее место',
+      roles: ['operator']
+    },
+    {
       path: '/reports/operators',
       icon: Users,
       label: 'Отчеты по операторам',
