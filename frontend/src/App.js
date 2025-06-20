@@ -10,6 +10,8 @@ import Dashboard from "./components/Dashboard";
 import OperatorReports from "./components/reports/OperatorReports";
 import QueueReports from "./components/reports/QueueReports";
 import MissedCallsReport from "./components/reports/MissedCallsReport";
+import OperatorDashboard from "./components/operator/OperatorDashboard";
+import AdminSettings from "./components/admin/AdminSettings";
 
 function App() {
   return (
@@ -25,6 +27,11 @@ function App() {
             }>
               <Route index element={<Dashboard />} />
               <Route path="dashboard" element={<Dashboard />} />
+              <Route path="operator" element={
+                <ProtectedRoute requiredRole="operator">
+                  <OperatorDashboard />
+                </ProtectedRoute>
+              } />
               <Route path="reports/operators" element={
                 <ProtectedRoute requiredRole="supervisor">
                   <OperatorReports />
@@ -54,14 +61,7 @@ function App() {
               } />
               <Route path="admin" element={
                 <ProtectedRoute requiredRole="admin">
-                  <div className="text-center py-20">
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
-                      Администрирование
-                    </h2>
-                    <p className="text-slate-600 dark:text-slate-400">
-                      Управление пользователями и системой будет реализовано в backend версии
-                    </p>
-                  </div>
+                  <AdminSettings />
                 </ProtectedRoute>
               } />
             </Route>
