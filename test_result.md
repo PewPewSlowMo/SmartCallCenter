@@ -317,3 +317,5 @@ agent_communication:
     message: "Completed comprehensive testing of all backend API endpoints. All tests passed successfully. The server is running correctly on port 8001, MongoDB connection is working, all endpoints respond correctly, and CORS is properly configured. No errors were found in the server logs."
   - agent: "testing"
     message: "Starting testing of the updated backend API for the call center. Will test all endpoints including authentication, dashboard, admin, operators, and queues endpoints."
+  - agent: "testing"
+    message: "Attempted to test the frontend application but encountered backend API connectivity issues. The backend server is running but has a ModuleNotFoundError: 'No module named 'models'' error. The frontend UI elements are properly implemented, but we cannot test the full functionality due to the backend API issues. The login page UI, demo login buttons, and form validation are working correctly."
