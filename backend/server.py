@@ -69,17 +69,11 @@ api_router = APIRouter(prefix="/api")
 async def get_database() -> DatabaseManager:
     return db_manager
 
-# Setup router dependencies after all routers are included
-for router in [auth_router, call_router, operator_router, queue_router, admin_router, dashboard_router]:
-    for route in router.routes:
-        if hasattr(route, 'dependant'):
-            # Replace DatabaseManager dependency with our instance
-            for i, dependency in enumerate(route.dependant.dependencies):
-                if hasattr(dependency, 'call') and dependency.call.__name__ == 'get_db':
-                    # Replace with our db_manager instance
-                    def get_db_override():
-                        return db_manager
-                    route.dependant.dependencies[i].call = get_db_override
+# Global database instance
+_db_manager = None
+
+def get_db():
+    return _db_manager
 
 # Health check endpoints
 @api_router.get("/")
