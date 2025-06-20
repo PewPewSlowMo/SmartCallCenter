@@ -111,35 +111,143 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "testing"
         comment: "Endpoint returns 'Hello World' message correctly with 200 status code."
 
-  - task: "POST /api/status endpoint"
+  - task: "GET /api/health endpoint"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
-      - working: true
-        agent: "testing"
-        comment: "Successfully creates status records with client_name, generates UUID, and includes timestamp."
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint needs to be tested."
 
-  - task: "GET /api/status endpoint"
+  - task: "POST /api/auth/login endpoint"
     implemented: true
-    working: true
-    file: "/app/backend/server.py"
+    working: "NA"
+    file: "/app/backend/routes/auth_routes.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
-      - working: true
-        agent: "testing"
-        comment: "Successfully retrieves list of status records from MongoDB."
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint needs to be tested with demo users."
+
+  - task: "GET /api/auth/me endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/routes/auth_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint needs to be tested with JWT token."
+
+  - task: "GET /api/dashboard/stats endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/routes/dashboard_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint needs to be tested."
+
+  - task: "GET /api/dashboard/realtime endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/routes/dashboard_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint needs to be tested."
+
+  - task: "GET /api/admin/users endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/routes/admin_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint needs to be tested with admin token."
+
+  - task: "GET /api/admin/groups endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/routes/admin_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint needs to be tested with admin token."
+
+  - task: "GET /api/admin/settings endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/routes/admin_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint needs to be tested with admin token."
+
+  - task: "GET /api/admin/system/info endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/routes/admin_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint needs to be tested with admin token."
+
+  - task: "GET /api/operators/ endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/routes/operator_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint needs to be tested."
+
+  - task: "GET /api/queues/ endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/routes/queue_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint needs to be tested."
 
   - task: "MongoDB connection"
     implemented: true
@@ -147,7 +255,7 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "testing"
@@ -159,7 +267,7 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "testing"
@@ -171,7 +279,7 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "testing"
