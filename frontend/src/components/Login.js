@@ -180,7 +180,7 @@ const Login = () => {
 
         {/* Footer */}
         <div className="text-center mt-8 text-sm text-slate-500 dark:text-slate-400">
-          <p>© 2024 CallCenter Analytics. Все права защищены.</p>
+          <p>© 2025 Smart Колл Центр. Разработано Denis для Национального Госпиталя.</p>
         </div>
       </div>
     </div>
