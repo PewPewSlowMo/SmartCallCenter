@@ -38,7 +38,51 @@ const Layout = () => {
     document.documentElement.classList.toggle('dark');
   };
 
-
+  // Define menu items
+  const menuItems = [
+    {
+      path: '/dashboard',
+      label: 'Дашборд',
+      icon: BarChart3,
+      roles: ['admin', 'manager', 'supervisor', 'operator']
+    },
+    {
+      path: '/operator',
+      label: 'Рабочее место',
+      icon: Headphones,
+      roles: ['operator']
+    },
+    {
+      path: '/reports/operators',
+      label: 'Отчет по операторам',
+      icon: Users,
+      roles: ['admin', 'manager', 'supervisor']
+    },
+    {
+      path: '/reports/queues',
+      label: 'Отчет по очередям',
+      icon: Phone,
+      roles: ['admin', 'manager', 'supervisor']
+    },
+    {
+      path: '/reports/missed-calls',
+      label: 'Пропущенные звонки',
+      icon: Clock,
+      roles: ['admin', 'manager', 'supervisor']
+    },
+    {
+      path: '/analytics',
+      label: 'Аналитика',
+      icon: TrendingUp,
+      roles: ['admin', 'manager']
+    },
+    {
+      path: '/admin',
+      label: 'Настройки',
+      icon: Settings,
+      roles: ['admin']
+    }
+  ];
 
   const filteredMenuItems = menuItems.filter(item => 
     item.roles.includes(user?.role)
