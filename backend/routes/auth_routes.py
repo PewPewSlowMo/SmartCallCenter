@@ -15,8 +15,12 @@ from auth import (
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
+# Create a dependency function that will be overridden
+def get_db() -> DatabaseManager:
+    pass  # This will be overridden by dependency injection
+
 @router.post("/login", response_model=Dict[str, Any])
-async def login(user_credentials: UserLogin, db: DatabaseManager = Depends()):
+async def login(user_credentials: UserLogin, db: DatabaseManager = Depends(get_db)):
     """Authenticate user and return JWT token"""
     user = await authenticate_user(db, user_credentials.username, user_credentials.password)
     
