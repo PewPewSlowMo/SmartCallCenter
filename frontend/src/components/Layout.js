@@ -17,7 +17,8 @@ import {
   Home,
   Phone,
   Clock,
-  TrendingUp
+  TrendingUp,
+  Headphones
 } from 'lucide-react';
 
 const Layout = () => {
