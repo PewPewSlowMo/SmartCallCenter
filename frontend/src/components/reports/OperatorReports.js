@@ -41,7 +41,7 @@ const OperatorReports = () => {
   const loadReportData = () => {
     setLoading(true);
     setTimeout(() => {
-      const data = generateOperatorReport();
+      const data = generateOperatorReport(mockCalls);
       setReportData(data);
       setLoading(false);
     }, 500);
