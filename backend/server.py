@@ -36,10 +36,11 @@ db_manager = None
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage application lifespan events"""
-    global db_manager
+    global db_manager, _db_manager
     
     # Startup
     db_manager = DatabaseManager(mongo_url, db_name)
+    _db_manager = db_manager
     await db_manager.create_indexes()
     
     # Initialize default data if needed
