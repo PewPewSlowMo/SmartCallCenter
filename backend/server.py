@@ -67,8 +67,8 @@ app = FastAPI(
 api_router = APIRouter(prefix="/api")
 
 # Dependency to get database manager
-async def get_database() -> DatabaseManager:
-    return db_manager
+def get_database() -> DatabaseManager:
+    return _db_manager
 
 # Global database instance
 _db_manager = None
