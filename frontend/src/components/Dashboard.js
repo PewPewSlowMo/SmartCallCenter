@@ -275,16 +275,53 @@ const Dashboard = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-64 flex items-center justify-center bg-slate-50 dark:bg-slate-900 rounded-lg">
-              <div className="text-center space-y-2">
-                <BarChart3 className="w-12 h-12 text-slate-400 mx-auto" />
-                <p className="text-slate-500 dark:text-slate-400">
-                  График загружается...
-                </p>
-                <p className="text-xs text-slate-400">
-                  Интеграция Chart.js будет добавлена в backend версии
-                </p>
-              </div>
+            <div className="h-64">
+              {chartData && chartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={chartData}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                    <XAxis 
+                      dataKey={period === 'today' ? 'hour' : 'date'} 
+                      stroke="#64748b"
+                      fontSize={12}
+                    />
+                    <YAxis stroke="#64748b" fontSize={12} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                    />
+                    <Legend />
+                    <Bar 
+                      dataKey="answered" 
+                      fill="#10b981"
+                      name="Отвечено"
+                      radius={[2, 2, 0, 0]}
+                    />
+                    <Bar 
+                      dataKey="missed" 
+                      fill="#ef4444"
+                      name="Пропущено"
+                      radius={[2, 2, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center bg-slate-50 dark:bg-slate-900 rounded-lg">
+                  <div className="text-center space-y-2">
+                    <BarChart3 className="w-12 h-12 text-slate-400 mx-auto" />
+                    <p className="text-slate-500 dark:text-slate-400">
+                      Нет данных для отображения
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
