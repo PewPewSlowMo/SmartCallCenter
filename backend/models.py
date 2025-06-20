@@ -37,12 +37,22 @@ class CallCategory(str, Enum):
     BILLING = "billing"
     OTHER = "other"
 
+# Legacy models for backward compatibility
+class StatusCheck(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    client_name: str
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+
+class StatusCheckCreate(BaseModel):
+    client_name: str
+
 # User Models
 class User(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     username: str
     email: str
     name: str
+    password_hash: str
     role: UserRole
     group_id: Optional[str] = None
     is_active: bool = True
