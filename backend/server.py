@@ -8,17 +8,17 @@ from pathlib import Path
 from contextlib import asynccontextmanager
 
 # Import models and database
-from models import *
-from database import DatabaseManager
-from auth import get_current_active_user
+from .models import *
+from .database import DatabaseManager
+from .auth import get_current_active_user
 
 # Import route modules
-from routes.auth_routes import router as auth_router
-from routes.call_routes import router as call_router
-from routes.operator_routes import router as operator_router
-from routes.queue_routes import router as queue_router
-from routes.admin_routes import router as admin_router
-from routes.dashboard_routes import router as dashboard_router
+from .routes.auth_routes import router as auth_router
+from .routes.call_routes import router as call_router
+from .routes.operator_routes import router as operator_router
+from .routes.queue_routes import router as queue_router
+from .routes.admin_routes import router as admin_router
+from .routes.dashboard_routes import router as dashboard_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
