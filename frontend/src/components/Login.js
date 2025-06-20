@@ -55,7 +55,7 @@ const Login = () => {
             <BarChart3 className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            CallCenter Analytics
+            Smart Колл Центр
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-2">
             Войдите в систему аналитики колл-центра
