@@ -35,12 +35,14 @@ async def create_user(
             detail="Email already exists"
         )
     
-    # Hash password
+    # Hash password and create user
+    from models import User as UserModel
     user_dict = user_data.dict()
     user_dict["password_hash"] = get_password_hash(user_data.password)
     del user_dict["password"]
     
-    user = await db.create_user(UserCreate(**user_dict))
+    user = UserModel(**user_dict)
+    await db.users.insert_one(user.dict())
     
     return UserResponse(
         id=user.id,
