@@ -450,22 +450,16 @@ metadata:
 
 test_plan:
   current_focus:
-    - "GET /api/ endpoint"
-    - "GET /api/health endpoint"
-    - "POST /api/auth/login endpoint"
-    - "GET /api/auth/me endpoint"
-    - "GET /api/dashboard/stats endpoint"
-    - "GET /api/dashboard/realtime endpoint"
-    - "GET /api/admin/users endpoint"
-    - "GET /api/admin/groups endpoint"
-    - "GET /api/admin/settings endpoint"
-    - "GET /api/admin/system/info endpoint"
-    - "GET /api/operators/ endpoint"
-    - "GET /api/queues/ endpoint"
-    - "MongoDB connection"
-    - "CORS configuration"
-    - "Server logs check"
-  stuck_tasks: []
+    - "Authentication functionality"
+    - "Dashboard UI"
+    - "Navigation and role-based access"
+    - "Reports functionality"
+    - "Operator dashboard"
+    - "Admin settings"
+    - "Theme switching"
+    - "Logout functionality"
+  stuck_tasks:
+    - "Authentication functionality"
   test_all: true
   test_priority: "high_first"
 
