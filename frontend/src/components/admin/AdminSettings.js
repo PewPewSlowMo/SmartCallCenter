@@ -69,22 +69,45 @@ const AdminSettings = () => {
   }, []);
 
   const loadSettings = async () => {
-    // Mock loading existing settings
     setLoading(true);
     
-    setTimeout(() => {
-      // Simulate loaded settings
-      setAsteriskConfig({
-        host: '192.168.1.100',
-        port: '5038',
-        username: 'admin',
-        password: '••••••••',
-        protocol: 'AMI',
-        timeout: '30'
+    try {
+      const result = await adminAPI.getSystemSettings();
+      if (result.success && result.data) {
+        const settings = result.data;
+        
+        // Update asterisk config
+        if (settings.asterisk_config) {
+          setAsteriskConfig({
+            host: settings.asterisk_config.host,
+            port: settings.asterisk_config.port.toString(),
+            username: settings.asterisk_config.username,
+            password: '••••••••', // Don't show real password
+            protocol: settings.asterisk_config.protocol,
+            timeout: settings.asterisk_config.timeout.toString()
+          });
+        }
+        
+        // Update system settings
+        setSystemSettings({
+          callRecording: settings.call_recording,
+          autoAnswerDelay: settings.auto_answer_delay.toString(),
+          maxCallDuration: settings.max_call_duration.toString(),
+          queueTimeout: settings.queue_timeout.toString(),
+          callbackEnabled: settings.callback_enabled,
+          smsNotifications: settings.sms_notifications,
+          emailNotifications: settings.email_notifications
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Ошибка загрузки",
+        description: "Не удалось загрузить настройки системы",
+        variant: "destructive"
       });
-      
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   const testAsteriskConnection = async () => {
