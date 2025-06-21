@@ -14,6 +14,7 @@ from contextlib import asynccontextmanager
 from models import *
 from database import DatabaseManager
 from auth import get_current_active_user
+from db import get_db, set_db
 
 # Import route modules
 from routes.auth_routes import router as auth_router
