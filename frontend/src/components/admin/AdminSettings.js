@@ -113,9 +113,17 @@ const AdminSettings = () => {
   const testAsteriskConnection = async () => {
     setConnectionStatus(prev => ({ ...prev, asterisk: 'testing' }));
     
-    setTimeout(() => {
-      // Mock connection test
-      const success = Math.random() > 0.3; // 70% success rate for demo
+    try {
+      const result = await adminAPI.testAsteriskConnection({
+        host: asteriskConfig.host,
+        port: parseInt(asteriskConfig.port),
+        username: asteriskConfig.username,
+        password: asteriskConfig.password,
+        protocol: asteriskConfig.protocol,
+        timeout: parseInt(asteriskConfig.timeout)
+      });
+      
+      const success = result.success && result.data && result.data.success;
       
       setConnectionStatus(prev => ({ 
         ...prev, 
@@ -125,11 +133,18 @@ const AdminSettings = () => {
       toast({
         title: success ? "Соединение установлено" : "Ошибка соединения",
         description: success 
-          ? "Успешное подключение к Asterisk" 
-          : "Не удалось подключиться к серверу Asterisk",
+          ? result.data.message 
+          : result.data?.message || "Не удалось подключиться к серверу Asterisk",
         variant: success ? "default" : "destructive"
       });
-    }, 2000);
+    } catch (error) {
+      setConnectionStatus(prev => ({ ...prev, asterisk: 'disconnected' }));
+      toast({
+        title: "Ошибка соединения",
+        description: "Не удалось протестировать соединение с Asterisk",
+        variant: "destructive"
+      });
+    }
   };
 
   const testDatabaseConnection = async () => {
