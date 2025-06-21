@@ -6,6 +6,7 @@ import sys
 from dotenv import load_dotenv
 import time
 from datetime import datetime
+import subprocess
 
 # Load environment variables from frontend/.env
 load_dotenv('/app/frontend/.env')
