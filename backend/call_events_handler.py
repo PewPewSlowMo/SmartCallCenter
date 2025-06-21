@@ -3,7 +3,8 @@ import logging
 from datetime import datetime
 from typing import Dict, Any
 from models import Call, CallCreate, CallUpdate, CallStatus, OperatorStatus
-from server import _db_manager as db
+from database import DatabaseManager
+from db import get_db
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +17,7 @@ class CallEventsHandler:
     async def handle_call_start(self, call_data: Dict[str, Any]):
         """Обработка начала звонка"""
         try:
+            db = get_db()
             channel_id = call_data.get("channel_id")
             caller_number = call_data.get("caller_number", "Unknown")
             
@@ -49,6 +51,7 @@ class CallEventsHandler:
     async def handle_call_answer(self, call_data: Dict[str, Any]):
         """Обработка ответа на звонок"""
         try:
+            db = get_db()
             channel_id = call_data.get("channel_id")
             call_id = self.active_calls.get(channel_id)
             
@@ -72,6 +75,7 @@ class CallEventsHandler:
     async def handle_call_end(self, call_data: Dict[str, Any]):
         """Обработка завершения звонка"""
         try:
+            db = get_db()
             channel_id = call_data.get("channel_id")
             call_id = self.active_calls.get(channel_id)
             
@@ -128,6 +132,7 @@ class CallEventsHandler:
     async def handle_operator_status_change(self, operator_data: Dict[str, Any]):
         """Обработка изменения статуса оператора"""
         try:
+            db = get_db()
             extension = operator_data.get("extension")
             status = operator_data.get("status")
             
@@ -158,6 +163,7 @@ class CallEventsHandler:
     async def _assign_operator_to_call(self, call_id: str, queue_id: str):
         """Назначение оператора на звонок"""
         try:
+            db = get_db()
             # Поиск доступных операторов
             available_operators = await db.operators.find({
                 "status": OperatorStatus.ONLINE,
