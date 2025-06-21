@@ -69,13 +69,7 @@ api_router = APIRouter(prefix="/api")
 
 # Dependency to get database manager
 def get_database() -> DatabaseManager:
-    return _db_manager
-
-# Global database instance
-_db_manager = None
-
-def get_db():
-    return _db_manager
+    return get_db()
 
 # Health check endpoints
 @api_router.get("/")
