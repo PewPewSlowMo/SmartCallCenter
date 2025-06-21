@@ -175,7 +175,26 @@ async def update_user(
         created_at=updated_user.created_at
     )
 
-@router.delete("/users/{user_id}", response_model=APIResponse)
+@router.get("/users/{user_id}/operator", response_model=Optional[dict])
+async def get_user_operator_info(
+    user_id: str,
+    current_user: User = Depends(require_admin),
+    db: DatabaseManager = Depends()
+):
+    """Get operator information for a user (admin only)"""
+    operator = await db.get_operator_by_user_id(user_id)
+    if operator:
+        return {
+            "id": operator.id,
+            "extension": operator.extension,
+            "status": operator.status,
+            "group_id": operator.group_id,
+            "skills": operator.skills,
+            "max_concurrent_calls": operator.max_concurrent_calls,
+            "current_calls": operator.current_calls,
+            "last_activity": operator.last_activity
+        }
+    return None
 async def delete_user(
     user_id: str,
     current_user: User = Depends(require_admin),
