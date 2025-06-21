@@ -22,6 +22,10 @@ print(f"Testing API at: {API_BASE_URL}")
 # Global variable to store auth tokens
 auth_tokens = {}
 
+# Test configuration
+TEST_ADMIN_USERNAME = "admin"
+TEST_ADMIN_PASSWORD = "admin"
+
 def test_root_endpoint():
     """Test the root endpoint GET /api/"""
     print("\n=== Testing GET /api/ endpoint ===")
