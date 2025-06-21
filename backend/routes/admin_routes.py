@@ -124,7 +124,7 @@ async def get_users(
 async def get_user(
     user_id: str,
     current_user: User = Depends(require_admin),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Get user by ID (admin only)"""
     user = await db.get_user_by_id(user_id)
@@ -150,7 +150,7 @@ async def update_user(
     user_id: str,
     user_updates: dict,
     current_user: User = Depends(require_admin),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Update user (admin only)"""
     user = await db.get_user_by_id(user_id)
@@ -188,7 +188,7 @@ async def update_user(
 async def get_user_operator_info(
     user_id: str,
     current_user: User = Depends(require_admin),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Get operator information for a user (admin only)"""
     operator = await db.get_operator_by_user_id(user_id)
@@ -207,7 +207,7 @@ async def get_user_operator_info(
 async def delete_user(
     user_id: str,
     current_user: User = Depends(require_admin),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Delete user (admin only)"""
     if user_id == current_user.id:
@@ -240,7 +240,7 @@ async def delete_user(
 async def create_group(
     group_data: GroupCreate,
     current_user: User = Depends(require_admin),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Create a new group (admin only)"""
     # Check if supervisor exists if provided
@@ -258,7 +258,7 @@ async def create_group(
 @router.get("/groups", response_model=List[Group])
 async def get_groups(
     current_user: User = Depends(require_admin),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Get list of all groups (admin only)"""
     groups = await db.get_groups()
@@ -268,7 +268,7 @@ async def get_groups(
 @router.get("/settings", response_model=Optional[SystemSettings])
 async def get_system_settings(
     current_user: User = Depends(require_admin),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Get system settings (admin only)"""
     settings = await db.get_system_settings()
@@ -278,7 +278,7 @@ async def get_system_settings(
 async def update_system_settings(
     settings_update: SystemSettingsUpdate,
     current_user: User = Depends(require_admin),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Update system settings (admin only)"""
     settings = await db.update_system_settings(settings_update, current_user.id)
@@ -310,7 +310,7 @@ async def update_system_settings(
 async def test_asterisk_connection(
     asterisk_config: AsteriskConfig,
     current_user: User = Depends(require_admin),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Test Asterisk connection (admin only)"""
     from asterisk_client import AsteriskARIClient
@@ -358,7 +358,7 @@ async def test_asterisk_connection(
 @router.get("/system/info", response_model=dict)
 async def get_system_info(
     current_user: User = Depends(require_admin),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Get system information (admin only)"""
     # Get counts of various entities
