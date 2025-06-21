@@ -25,7 +25,7 @@ router = APIRouter(prefix="/admin", tags=["Administration"])
 async def create_user(
     user_data: UserCreate,
     current_user: User = Depends(require_admin),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Create a new user (admin only)"""
     # Check if username already exists
