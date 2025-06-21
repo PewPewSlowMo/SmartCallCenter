@@ -12,6 +12,12 @@ from models import (
 from database import DatabaseManager
 from auth import require_admin, get_password_hash
 
+# Import the get_db function from server
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from server import get_db
+
 router = APIRouter(prefix="/admin", tags=["Administration"])
 
 # User Management
