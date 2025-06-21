@@ -52,6 +52,18 @@ const UserManagement = () => {
       const result = await adminAPI.getUsers();
       if (result.success) {
         setUsers(result.data);
+        
+        // Загружаем extensions для операторов
+        const extensions = {};
+        for (const user of result.data) {
+          if (user.role === 'operator') {
+            const operatorResult = await adminAPI.getUserOperatorInfo(user.id);
+            if (operatorResult.success && operatorResult.data) {
+              extensions[user.id] = operatorResult.data.extension;
+            }
+          }
+        }
+        setOperatorExtensions(extensions);
       } else {
         throw new Error(result.error);
       }
