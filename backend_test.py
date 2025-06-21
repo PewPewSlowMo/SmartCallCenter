@@ -263,6 +263,27 @@ def test_admin_settings(role):
         print(f"❌ Admin settings endpoint test failed with {role} token: {str(e)}")
         return False
 
+def test_admin_settings_get():
+    """Test the admin settings endpoint GET /api/admin/settings"""
+    print("\n=== Testing GET /api/admin/settings endpoint ===")
+    try:
+        if "admin" not in auth_tokens:
+            print("❌ No admin token available")
+            return False
+            
+        headers = {"Authorization": f"Bearer {auth_tokens['admin']}"}
+        response = requests.get(f"{API_BASE_URL}/admin/settings", headers=headers)
+        print(f"Status Code: {response.status_code}")
+        
+        assert response.status_code == 200, f"Expected status code 200, got {response.status_code}"
+        assert "call_recording" in response.json(), "Response does not contain 'call_recording' field"
+        
+        print("✅ Admin settings GET endpoint test passed!")
+        return True
+    except Exception as e:
+        print(f"❌ Admin settings GET endpoint test failed: {str(e)}")
+        return False
+
 def test_admin_system_info(role):
     """Test the admin system info endpoint GET /api/admin/system/info"""
     print(f"\n=== Testing GET /api/admin/system/info endpoint with {role} token ===")
