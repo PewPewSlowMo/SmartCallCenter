@@ -1,5 +1,8 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from typing import List, Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 from models import (
     User, UserCreate, UserResponse, Group, GroupCreate,
