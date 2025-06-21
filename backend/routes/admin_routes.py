@@ -35,14 +35,46 @@ async def create_user(
             detail="Email already exists"
         )
     
+    # Check for extension if creating operator
+    extension = None
+    if hasattr(user_data, 'extension') and user_data.extension:
+        extension = user_data.extension
+        # Check if extension already exists
+        existing_operator = await db.operators.find_one({"extension": extension})
+        if existing_operator:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Extension {extension} already assigned to another operator"
+            )
+    elif user_data.role == UserRole.OPERATOR:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Extension is required for operator role"
+        )
+    
     # Hash password and create user
     from models import User as UserModel
     user_dict = user_data.dict()
     user_dict["password_hash"] = get_password_hash(user_data.password)
     del user_dict["password"]
     
+    # Remove extension from user data if present
+    if "extension" in user_dict:
+        del user_dict["extension"]
+    
     user = UserModel(**user_dict)
     await db.users.insert_one(user.dict())
+    
+    # Create operator record if user is operator
+    if user.role == UserRole.OPERATOR and extension:
+        operator_data = OperatorCreate(
+            user_id=user.id,
+            extension=extension,
+            group_id=user.group_id,
+            skills=["general"],
+            max_concurrent_calls=1
+        )
+        await db.create_operator(operator_data)
     
     return UserResponse(
         id=user.id,
