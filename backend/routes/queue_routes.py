@@ -7,11 +7,11 @@ from models import (
 from database import DatabaseManager
 from auth import require_supervisor, require_admin
 
-# Import the get_db function from server
+# Import the get_db function from db
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from server import get_db
+from db import get_db
 
 router = APIRouter(prefix="/queues", tags=["Queues"])
 
