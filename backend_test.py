@@ -26,6 +26,15 @@ auth_tokens = {}
 # Test configuration
 TEST_ADMIN_USERNAME = "admin"
 TEST_ADMIN_PASSWORD = "admin"
+TEST_OPERATOR_USERNAME = "TestOperator"
+TEST_OPERATOR_PASSWORD = "password123"
+TEST_OPERATOR_EXTENSION = "1001"
+TEST_MANAGER_USERNAME = "TestManager"
+TEST_MANAGER_PASSWORD = "password123"
+
+# Global variables for user IDs
+operator_user_id = None
+manager_user_id = None
 
 def test_root_endpoint():
     """Test the root endpoint GET /api/"""
