@@ -24,8 +24,8 @@ print(f"Testing API at: {API_BASE_URL}")
 auth_tokens = {}
 
 # Test configuration
-TEST_ADMIN_USERNAME = "admin"
-TEST_ADMIN_PASSWORD = "admin"
+TEST_ADMIN_USERNAME = "admin@callcenter.com"
+TEST_ADMIN_PASSWORD = "admin123"
 
 def test_auth_login(username, password, expected_role=None):
     """Test the login endpoint POST /api/auth/login"""
