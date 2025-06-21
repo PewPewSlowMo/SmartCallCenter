@@ -226,7 +226,13 @@ test_plan:
     - "Asterisk Connection Test API"
     - "Database Demo Data Cleanup"
     - "Admin Settings - API Integration"
-  stuck_tasks: []
+    - "User Creation with Extension"
+    - "Operator Info Endpoint"
+  stuck_tasks:
+    - "Admin Settings API - Save Settings"
+    - "Asterisk Connection Test API"
+    - "User Creation with Extension"
+    - "Operator Info Endpoint"
   test_all: false
   test_priority: "high_first"
 
