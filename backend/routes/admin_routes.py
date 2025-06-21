@@ -101,7 +101,7 @@ async def get_users(
     skip: int = 0,
     limit: int = 100,
     current_user: User = Depends(require_admin),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Get list of all users (admin only)"""
     users = await db.get_users(skip=skip, limit=limit)
