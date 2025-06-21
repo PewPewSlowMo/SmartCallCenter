@@ -132,107 +132,29 @@ async def initialize_default_data(db: DatabaseManager):
     """Initialize default data if database is empty"""
     try:
         # Check if admin user exists
-        admin_user = await db.get_user_by_username("admin@callcenter.com")
+        admin_user = await db.get_user_by_username("admin")
         
         if not admin_user:
-            logger.info("Initializing default data...")
+            logger.info("Initializing default admin user...")
             
-            # Create default groups
-            support_group = await db.create_group(GroupCreate(
-                name="Группа поддержки",
-                description="Техническая поддержка клиентов"
-            ))
-            
-            sales_group = await db.create_group(GroupCreate(
-                name="Группа продаж", 
-                description="Отдел продаж"
-            ))
-            
-            vip_group = await db.create_group(GroupCreate(
-                name="VIP группа",
-                description="Обслуживание VIP клиентов"
-            ))
-            
-            # Create default users
             from auth import get_password_hash
             
-            # Admin user
+            # Create only admin user
             admin_user_data = User(
-                username="admin@callcenter.com",
+                username="admin",
                 email="admin@callcenter.com",
-                name="Администратор",
-                password_hash=get_password_hash("admin123"),
+                name="Администратор системы",
+                password_hash=get_password_hash("admin"),
                 role=UserRole.ADMIN
             )
             await db.users.insert_one(admin_user_data.dict())
             
-            # Manager user
-            manager_user_data = User(
-                username="manager@callcenter.com",
-                email="manager@callcenter.com", 
-                name="Менеджер Иван",
-                password_hash=get_password_hash("manager123"),
-                role=UserRole.MANAGER
-            )
-            await db.users.insert_one(manager_user_data.dict())
-            
-            # Supervisor user
-            supervisor_user_data = User(
-                username="supervisor@callcenter.com",
-                email="supervisor@callcenter.com",
-                name="Супервайзер Анна",
-                password_hash=get_password_hash("supervisor123"),
-                role=UserRole.SUPERVISOR,
-                group_id=support_group.id
-            )
-            await db.users.insert_one(supervisor_user_data.dict())
-            
-            # Operator user
-            operator_user_data = User(
-                username="operator@callcenter.com",
-                email="operator@callcenter.com",
-                name="Оператор Петр",
-                password_hash=get_password_hash("operator123"),
-                role=UserRole.OPERATOR,
-                group_id=support_group.id
-            )
-            await db.users.insert_one(operator_user_data.dict())
-            
-            # Create default queues
+            # Create basic queue
             main_queue = await db.create_queue(QueueCreate(
                 name="Основная очередь",
                 description="Основная очередь для входящих звонков",
                 max_wait_time=300,
                 priority=1
-            ))
-            
-            support_queue = await db.create_queue(QueueCreate(
-                name="Техподдержка",
-                description="Очередь технической поддержки",
-                max_wait_time=180,
-                priority=2
-            ))
-            
-            sales_queue = await db.create_queue(QueueCreate(
-                name="Продажи",
-                description="Очередь отдела продаж",
-                max_wait_time=120,
-                priority=3
-            ))
-            
-            vip_queue = await db.create_queue(QueueCreate(
-                name="VIP клиенты",
-                description="Приоритетная очередь для VIP клиентов",
-                max_wait_time=60,
-                priority=5
-            ))
-            
-            # Create operator records
-            await db.create_operator(OperatorCreate(
-                user_id=operator_user_data.id,
-                extension="1001",
-                group_id=support_group.id,
-                skills=["support", "technical"]
             ))
             
             # Create default system settings
@@ -248,7 +170,7 @@ async def initialize_default_data(db: DatabaseManager):
             )
             await db.settings.insert_one(default_settings.dict())
             
-            logger.info("Default data initialized successfully")
+            logger.info("Default admin user and basic settings initialized successfully")
         
     except Exception as e:
         logger.error(f"Error initializing default data: {e}")
