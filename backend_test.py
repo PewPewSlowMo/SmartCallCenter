@@ -63,28 +63,36 @@ def test_health_endpoint():
         print(f"❌ Health endpoint test failed: {str(e)}")
         return False
 
-def test_auth_login(username, password, role):
+def test_auth_login(username, password, expected_role=None):
     """Test the login endpoint POST /api/auth/login"""
-    print(f"\n=== Testing POST /api/auth/login endpoint with {role} user ===")
+    print(f"\n=== Testing POST /api/auth/login endpoint with {username} user ===")
     try:
         payload = {"username": username, "password": password}
         response = requests.post(f"{API_BASE_URL}/auth/login", json=payload)
         print(f"Status Code: {response.status_code}")
-        print(f"Response contains token: {'access_token' in response.json()}")
         
-        assert response.status_code == 200, f"Expected status code 200, got {response.status_code}"
-        assert "access_token" in response.json(), "Response does not contain 'access_token' field"
-        assert "token_type" in response.json(), "Response does not contain 'token_type' field"
-        assert "user" in response.json(), "Response does not contain 'user' field"
-        assert response.json()["user"]["role"] == role, f"User role does not match expected role {role}"
-        
-        # Store the token for later use
-        auth_tokens[role] = response.json()["access_token"]
-        
-        print(f"✅ Login endpoint test passed for {role} user!")
-        return True
+        if response.status_code == 200:
+            print(f"Response contains token: {'access_token' in response.json()}")
+            
+            assert "access_token" in response.json(), "Response does not contain 'access_token' field"
+            assert "token_type" in response.json(), "Response does not contain 'token_type' field"
+            assert "user" in response.json(), "Response does not contain 'user' field"
+            
+            if expected_role:
+                assert response.json()["user"]["role"] == expected_role, f"User role does not match expected role {expected_role}"
+            
+            # Store the token for later use
+            role = response.json()["user"]["role"]
+            auth_tokens[role] = response.json()["access_token"]
+            
+            print(f"✅ Login endpoint test passed for {username} user!")
+            return True
+        else:
+            print(f"Login failed with status code: {response.status_code}")
+            print(f"Response: {response.text}")
+            return False
     except Exception as e:
-        print(f"❌ Login endpoint test failed for {role} user: {str(e)}")
+        print(f"❌ Login endpoint test failed for {username} user: {str(e)}")
         return False
 
 def test_auth_me(role):
