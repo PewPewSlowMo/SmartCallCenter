@@ -276,6 +276,28 @@ async def update_system_settings(
 ):
     """Update system settings (admin only)"""
     settings = await db.update_system_settings(settings_update, current_user.id)
+    
+    # Initialize ARI client if Asterisk settings are provided and enabled
+    if settings.asterisk_config and settings.asterisk_config.enabled:
+        from asterisk_client import initialize_ari_client
+        try:
+            ari_config = {
+                "host": settings.asterisk_config.host,
+                "port": settings.asterisk_config.port,
+                "username": settings.asterisk_config.username,
+                "password": settings.asterisk_config.password,
+                "use_ssl": settings.asterisk_config.protocol == "ARI_SSL"
+            }
+            
+            success = await initialize_ari_client(ari_config)
+            if success:
+                logger.info("ARI client initialized successfully after settings update")
+            else:
+                logger.warning("Failed to initialize ARI client after settings update")
+                
+        except Exception as e:
+            logger.error(f"Error initializing ARI client: {e}")
+    
     return settings
 
 @router.post("/settings/asterisk/test", response_model=APIResponse)
