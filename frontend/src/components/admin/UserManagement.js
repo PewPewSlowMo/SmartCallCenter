@@ -25,6 +25,7 @@ import {
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [groups, setGroups] = useState([]);
+  const [operatorExtensions, setOperatorExtensions] = useState({}); // Хранение extensions операторов
   const [loading, setLoading] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
