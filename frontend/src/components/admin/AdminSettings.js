@@ -9,6 +9,7 @@ import { Separator } from '../ui/separator';
 import { Badge } from '../ui/badge';
 import { Alert, AlertDescription } from '../ui/alert';
 import { useToast } from '../../hooks/use-toast';
+import { adminAPI } from '../../services/api';
 import { 
   Settings, 
   Server, 
