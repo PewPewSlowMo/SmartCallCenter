@@ -11,7 +11,7 @@ import OperatorReports from "./components/reports/OperatorReports";
 import QueueReports from "./components/reports/QueueReports";
 import MissedCallsReport from "./components/reports/MissedCallsReport";
 import OperatorDashboard from "./components/operator/OperatorDashboard";
-import AdminSettings from "./components/admin/AdminSettings";
+import AdminPanel from "./components/admin/AdminPanel";
 
 function App() {
   return (
