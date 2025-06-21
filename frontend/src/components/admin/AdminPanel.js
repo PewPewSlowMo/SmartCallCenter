@@ -55,7 +55,6 @@ const AdminPanel = () => {
             <UserManagement />
           </TabsContent>
         </Tabs>
-      </div>
     </div>
   );
 };
