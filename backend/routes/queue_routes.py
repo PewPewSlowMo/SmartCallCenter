@@ -19,7 +19,7 @@ router = APIRouter(prefix="/queues", tags=["Queues"])
 async def create_queue(
     queue_data: QueueCreate,
     current_user: User = Depends(require_admin),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Create a new queue (admin only)"""
     # Check if queue name already exists
@@ -36,7 +36,7 @@ async def create_queue(
 @router.get("/", response_model=List[Queue])
 async def get_queues(
     current_user: User = Depends(require_supervisor),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Get list of all active queues"""
     queues = await db.get_queues()
@@ -46,7 +46,7 @@ async def get_queues(
 async def get_queue(
     queue_id: str,
     current_user: User = Depends(require_supervisor),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Get queue by ID"""
     queue = await db.get_queue_by_id(queue_id)
@@ -64,7 +64,7 @@ async def get_queue_stats(
     end_date: Optional[str] = Query(None),
     queue_id: Optional[str] = Query(None),
     current_user: User = Depends(require_supervisor),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Get queue performance statistics"""
     query = StatsQuery(
@@ -101,7 +101,7 @@ async def update_queue(
     queue_id: str,
     queue_update: QueueCreate,  # Reusing create model for simplicity
     current_user: User = Depends(require_admin),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Update queue (admin only)"""
     queue = await db.get_queue_by_id(queue_id)
@@ -139,7 +139,7 @@ async def update_queue(
 async def delete_queue(
     queue_id: str,
     current_user: User = Depends(require_admin),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Soft delete queue (admin only)"""
     queue = await db.get_queue_by_id(queue_id)
