@@ -4,7 +4,7 @@ from typing import List, Optional
 from models import (
     User, UserCreate, UserResponse, Group, GroupCreate,
     SystemSettings, SystemSettingsUpdate, AsteriskConfig,
-    APIResponse
+    APIResponse, UserRole, OperatorCreate
 )
 from database import DatabaseManager
 from auth import require_admin, get_password_hash
