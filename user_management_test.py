@@ -344,11 +344,14 @@ def run_user_management_tests():
     }
     
     # Test user management with extensions
+    create_user_result = test_create_user_with_extension()
+    create_non_operator_result = test_create_non_operator_with_extension()
+    
     user_management_results = {
-        "create_user_with_extension": test_create_user_with_extension()[0],
+        "create_user_with_extension": create_user_result[0] if isinstance(create_user_result, tuple) else create_user_result,
         "create_user_duplicate_extension": test_create_user_duplicate_extension(),
         "create_operator_without_extension": test_create_operator_without_extension(),
-        "create_non_operator_with_extension": test_create_non_operator_with_extension()[0],
+        "create_non_operator_with_extension": create_non_operator_result[0] if isinstance(create_non_operator_result, tuple) else create_non_operator_result,
     }
     
     # Test system settings with Asterisk
