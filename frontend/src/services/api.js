@@ -399,6 +399,15 @@ export const adminAPI = {
     }
   },
 
+  getUserOperatorInfo: async (userId) => {
+    try {
+      const response = await api.get(`/admin/users/${userId}/operator`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
   getSystemInfo: async () => {
     try {
       const response = await api.get('/admin/system/info');
