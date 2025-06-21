@@ -231,29 +231,39 @@ async def test_asterisk_connection(
     db: DatabaseManager = Depends()
 ):
     """Test Asterisk connection (admin only)"""
-    # This is a mock implementation
-    # In a real system, you would implement actual Asterisk connection testing
+    from asterisk_client import AsteriskARIClient
     
     try:
-        # Mock connection test
+        # Validate required parameters
         if not asterisk_config.host or not asterisk_config.username:
-            raise Exception("Missing required connection parameters")
+            return APIResponse(
+                success=False,
+                message="Missing required connection parameters (host and username)"
+            )
         
-        # Simulate connection test
-        import asyncio
-        await asyncio.sleep(1)  # Simulate network delay
+        # Create temporary ARI client for testing
+        ari_client = AsteriskARIClient(
+            host=asterisk_config.host,
+            port=asterisk_config.port,
+            username=asterisk_config.username,
+            password=asterisk_config.password
+        )
         
-        # Mock success/failure (70% success rate for demo)
-        import random
-        if random.random() < 0.7:
+        # Test the connection
+        result = await ari_client.test_connection()
+        
+        # Clean up
+        await ari_client.disconnect()
+        
+        if result["success"]:
             return APIResponse(
                 success=True,
-                message="Successfully connected to Asterisk server"
+                message=f"Successfully connected to Asterisk {result.get('asterisk_version', 'Unknown version')}"
             )
         else:
             return APIResponse(
                 success=False,
-                message="Failed to connect to Asterisk server. Please check your configuration."
+                message=f"Connection failed: {result.get('error', 'Unknown error')}"
             )
             
     except Exception as e:
