@@ -66,6 +66,7 @@ class UserCreate(BaseModel):
     password: str
     role: UserRole
     group_id: Optional[str] = None
+    extension: Optional[str] = None  # Для операторов
 
 class UserLogin(BaseModel):
     username: str
