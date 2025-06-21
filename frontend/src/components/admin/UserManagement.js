@@ -479,7 +479,9 @@ const UserManagement = () => {
                         {user.role === 'operator' ? (
                           <div className="flex items-center space-x-1">
                             <Phone className="w-3 h-3 text-blue-500" />
-                            <span className="text-sm font-mono">Loading...</span>
+                            <span className="text-sm font-mono">
+                              {operatorExtensions[user.id] || "Не назначен"}
+                            </span>
                           </div>
                         ) : (
                           <span className="text-slate-400 text-sm">N/A</span>
