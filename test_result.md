@@ -116,6 +116,9 @@ backend:
       - working: "NA"
         agent: "main"
         comment: "Backend endpoint /admin/settings PUT уже был реализован, нужно протестировать работу"
+      - working: false
+        agent: "testing"
+        comment: "Endpoint returns 422 Unprocessable Entity error. The database dependency injection is not working correctly. The endpoint expects mongo_url and db_name query parameters which are not provided."
 
   - task: "Asterisk Connection Test API"  
     implemented: true
@@ -128,6 +131,9 @@ backend:
       - working: "NA"
         agent: "main"
         comment: "Заменил mock тестирование на реальную проверку через AsteriskARIClient. Нужно протестировать с реальными и неверными данными Asterisk"
+      - working: false
+        agent: "testing"
+        comment: "Endpoint returns 422 Unprocessable Entity error. The database dependency injection is not working correctly. The endpoint expects mongo_url and db_name query parameters which are not provided."
 
   - task: "Database Demo Data Cleanup"
     implemented: true
@@ -140,6 +146,9 @@ backend:
       - working: "NA"
         agent: "main"
         comment: "Удалил все демо пользователи, теперь создается только admin/admin и базовые настройки. База данных очищена"
+      - working: false
+        agent: "testing"
+        comment: "Could not test this functionality due to database dependency injection issues."
 
   - task: "System Settings Database Operations"
     implemented: true  
@@ -152,6 +161,33 @@ backend:
       - working: "NA"
         agent: "main" 
         comment: "Функции get_system_settings и update_system_settings уже реализованы в DatabaseManager"
+      - working: false
+        agent: "testing"
+        comment: "Could not test this functionality due to database dependency injection issues."
+
+  - task: "User Creation with Extension"
+    implemented: true
+    working: false
+    file: "/app/backend/routes/admin_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Endpoint returns 422 Unprocessable Entity error. The database dependency injection is not working correctly. The endpoint expects mongo_url and db_name query parameters which are not provided."
+
+  - task: "Operator Info Endpoint"
+    implemented: true
+    working: false
+    file: "/app/backend/routes/admin_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Endpoint returns 422 Unprocessable Entity error. The database dependency injection is not working correctly. The endpoint expects mongo_url and db_name query parameters which are not provided."
 
 frontend:
   - task: "Admin Settings - API Integration"
