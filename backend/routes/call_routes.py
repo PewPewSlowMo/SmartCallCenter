@@ -22,7 +22,7 @@ router = APIRouter(prefix="/calls", tags=["Calls"])
 async def create_call(
     call_data: CallCreate,
     current_user: User = Depends(get_current_active_user),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Create a new call record"""
     call = await db.create_call(call_data)
@@ -40,7 +40,7 @@ async def get_calls(
     caller_number: Optional[str] = Query(None),
     category: Optional[str] = Query(None),
     current_user: User = Depends(require_supervisor),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Get calls with filtering options"""
     filters = CallFilters(
@@ -73,7 +73,7 @@ async def get_my_calls(
     start_date: Optional[datetime] = Query(None),
     end_date: Optional[datetime] = Query(None),
     current_user: User = Depends(require_operator),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Get calls for the current operator"""
     # Get operator record for current user
@@ -97,7 +97,7 @@ async def get_my_calls(
 async def get_call(
     call_id: str,
     current_user: User = Depends(get_current_active_user),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Get a specific call by ID"""
     call = await db.get_call_by_id(call_id)
@@ -123,7 +123,7 @@ async def update_call(
     call_id: str,
     call_update: CallUpdate,
     current_user: User = Depends(require_operator),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Update a call record"""
     call = await db.get_call_by_id(call_id)
@@ -157,7 +157,7 @@ async def save_call_details(
     call_id: str,
     call_details: CallDetails,
     current_user: User = Depends(require_operator),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Save call details after call completion"""
     call = await db.get_call_by_id(call_id)
@@ -207,7 +207,7 @@ async def get_call_stats(
     operator_id: Optional[str] = Query(None),
     group_id: Optional[str] = Query(None),
     current_user: User = Depends(require_supervisor),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Get call statistics summary"""
     query = StatsQuery(
@@ -234,7 +234,7 @@ async def get_missed_calls(
     end_date: Optional[datetime] = Query(None),
     queue_id: Optional[str] = Query(None),
     current_user: User = Depends(require_supervisor),
-    db: DatabaseManager = Depends()
+    db: DatabaseManager = Depends(get_db)
 ):
     """Get missed calls"""
     filters = CallFilters(
