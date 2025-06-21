@@ -1,16 +1,25 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from typing import Dict, Any, List
 import logging
 
 from models import APIResponse, AsteriskConfig
 from asterisk_client import get_ari_client, initialize_ari_client
-from server import _db_manager as db
+from database import DatabaseManager
+
+# Import the get_db function from db
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from db import get_db
 
 router = APIRouter(prefix="/asterisk", tags=["Asterisk Integration"])
 logger = logging.getLogger(__name__)
 
 @router.post("/connect", response_model=APIResponse)
-async def connect_to_asterisk(config: AsteriskConfig):
+async def connect_to_asterisk(
+    config: AsteriskConfig,
+    db: DatabaseManager = Depends(get_db)
+):
     """Подключение к Asterisk ARI"""
     try:
         # Сохранение конфигурации в БД
@@ -70,7 +79,9 @@ async def test_asterisk_connection(config: AsteriskConfig):
         }
 
 @router.get("/status", response_model=Dict[str, Any])
-async def get_asterisk_status():
+async def get_asterisk_status(
+    db: DatabaseManager = Depends(get_db)
+):
     """Получение статуса подключения к Asterisk"""
     try:
         ari_client = await get_ari_client()
