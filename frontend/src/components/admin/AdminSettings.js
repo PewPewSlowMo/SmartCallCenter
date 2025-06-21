@@ -148,10 +148,27 @@ const AdminSettings = () => {
   };
 
   const testDatabaseConnection = async () => {
-    toast({
-      title: "База данных",
-      description: "Соединение с MongoDB активно",
-    });
+    try {
+      const result = await adminAPI.getSystemInfo();
+      if (result.success && result.data) {
+        toast({
+          title: "База данных",
+          description: `Соединение активно. Пользователей: ${result.data.users}, Звонков сегодня: ${result.data.calls_today}`,
+        });
+      } else {
+        toast({
+          title: "База данных",
+          description: "Ошибка подключения к базе данных",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "База данных", 
+        description: "Ошибка тестирования соединения с БД",
+        variant: "destructive"
+      });
+    }
   };
 
   const saveSettings = async () => {
