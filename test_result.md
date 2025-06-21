@@ -102,6 +102,102 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
+user_problem_statement: "Исправить 3 критические проблемы в Smart Call Center: 1) Настройки не сохраняются в админ панели, 2) Ложный тест соединения Asterisk, 3) Очистить демо данные, оставить только admin/admin"
+
+backend:
+  - task: "Admin Settings API - Save Settings"
+    implemented: true
+    working: "NA" 
+    file: "/app/backend/routes/admin_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Backend endpoint /admin/settings PUT уже был реализован, нужно протестировать работу"
+
+  - task: "Asterisk Connection Test API"  
+    implemented: true
+    working: "NA"
+    file: "/app/backend/routes/admin_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Заменил mock тестирование на реальную проверку через AsteriskARIClient. Нужно протестировать с реальными и неверными данными Asterisk"
+
+  - task: "Database Demo Data Cleanup"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Удалил все демо пользователи, теперь создается только admin/admin и базовые настройки. База данных очищена"
+
+  - task: "System Settings Database Operations"
+    implemented: true  
+    working: "NA"
+    file: "/app/backend/database.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main" 
+        comment: "Функции get_system_settings и update_system_settings уже реализованы в DatabaseManager"
+
+frontend:
+  - task: "Admin Settings - API Integration"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/admin/AdminSettings.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Заменил все mock функции на реальные API вызовы: loadSettings, saveSettings, testAsteriskConnection, testDatabaseConnection"
+
+  - task: "API Service Methods"
+    implemented: true
+    working: "NA" 
+    file: "/app/frontend/src/services/api.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "adminAPI.getSystemSettings, updateSystemSettings, testAsteriskConnection уже были реализованы"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0" 
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Admin Settings API - Save Settings"
+    - "Asterisk Connection Test API"
+    - "Database Demo Data Cleanup"
+    - "Admin Settings - API Integration"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Исправил все 3 критические проблемы: 1) Подключил frontend к реальному API для сохранения настроек, 2) Заменил mock тестирование Asterisk на реальную проверку через AsteriskARIClient, 3) Очистил базу данных и изменил инициализацию чтобы создавался только admin/admin пользователь. Все изменения реализованы и готовы к тестированию."
+
 user_problem_statement: "Протестируй обновленный backend API для колл-центра. Проверь: 1. **Базовые endpoints:** - GET /api/ - hello world - GET /api/health - проверка здоровья системы 2. **Аутентификация:** - POST /api/auth/login с демо пользователями: - admin@callcenter.com / admin123 - manager@callcenter.com / manager123 - supervisor@callcenter.com / supervisor123 - operator@callcenter.com / operator123 - GET /api/auth/me с JWT токеном 3. **Dashboard API:** - GET /api/dashboard/stats - статистика дашборда - GET /api/dashboard/realtime - реальные данные 4. **Администрирование (с admin токеном):** - GET /api/admin/users - список пользователей - GET /api/admin/groups - список групп - GET /api/admin/settings - системные настройки - GET /api/admin/system/info - системная информация 5. **Операторы:** - GET /api/operators/ - список операторов 6. **Очереди:** - GET /api/queues/ - список очередей Убедись что: - Сервер запускается без ошибок - Инициализация данных работает корректно - JWT аутентификация функционирует - Ролевая система работает (разные права доступа) - Возвращаются правильные HTTP статусы - MongoDB индексы создаются Также проверь логи на наличие ошибок."
 
 backend:
