@@ -3,7 +3,7 @@ import aiohttp
 import websockets
 import json
 import logging
-from typing import Dict, Any, Optional, Callable
+from typing import Dict, Any, Optional, Callable, List
 from datetime import datetime
 import ssl
 from urllib.parse import urljoin
