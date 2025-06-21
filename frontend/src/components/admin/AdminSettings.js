@@ -157,13 +157,45 @@ const AdminSettings = () => {
   const saveSettings = async () => {
     setLoading(true);
     
-    setTimeout(() => {
+    try {
+      const settingsToSave = {
+        call_recording: systemSettings.callRecording,
+        auto_answer_delay: parseInt(systemSettings.autoAnswerDelay),
+        max_call_duration: parseInt(systemSettings.maxCallDuration),
+        queue_timeout: parseInt(systemSettings.queueTimeout),
+        callback_enabled: systemSettings.callbackEnabled,
+        sms_notifications: systemSettings.smsNotifications,
+        email_notifications: systemSettings.emailNotifications,
+        asterisk_config: {
+          host: asteriskConfig.host,
+          port: parseInt(asteriskConfig.port),
+          username: asteriskConfig.username,
+          password: asteriskConfig.password,
+          protocol: asteriskConfig.protocol,
+          timeout: parseInt(asteriskConfig.timeout),
+          enabled: asteriskConfig.host && asteriskConfig.username
+        }
+      };
+      
+      const result = await adminAPI.updateSystemSettings(settingsToSave);
+      
+      if (result.success) {
+        toast({
+          title: "Настройки сохранены",
+          description: "Конфигурация системы успешно обновлена",
+        });
+      } else {
+        throw new Error(result.error || "Ошибка сохранения настроек");
+      }
+    } catch (error) {
       toast({
-        title: "Настройки сохранены",
-        description: "Конфигурация системы успешно обновлена",
+        title: "Ошибка сохранения",
+        description: error.message || "Не удалось сохранить настройки",
+        variant: "destructive"
       });
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   const getStatusIcon = (status) => {
