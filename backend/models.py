@@ -381,6 +381,12 @@ class PaginatedResponse(BaseModel):
     page_size: int
     total_pages: int
 
+class StatusCheck(BaseModel):
+    """Status check response"""
+    status: str
+    database: str
+    timestamp: str
+
 # ===== API RESPONSE =====
 class APIResponse(BaseModel):
     success: bool
