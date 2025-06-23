@@ -8,7 +8,7 @@ from models import (
     User, UserRole
 )
 from database import DatabaseManager
-from auth import get_current_active_user, require_role("operator"), require_supervisor
+from auth import get_current_active_user, require_role("operator"), require_supervisor_or_admin
 
 # Import the get_db function from db
 import sys
@@ -39,7 +39,7 @@ async def get_calls(
     operator_id: Optional[str] = Query(None),
     caller_number: Optional[str] = Query(None),
     category: Optional[str] = Query(None),
-    current_user: User = Depends(require_supervisor),
+    current_user: User = Depends(require_supervisor_or_admin),
     db: DatabaseManager = Depends(get_db)
 ):
     """Get calls with filtering options"""
@@ -206,7 +206,7 @@ async def get_call_stats(
     queue_id: Optional[str] = Query(None),
     operator_id: Optional[str] = Query(None),
     group_id: Optional[str] = Query(None),
-    current_user: User = Depends(require_supervisor),
+    current_user: User = Depends(require_supervisor_or_admin),
     db: DatabaseManager = Depends(get_db)
 ):
     """Get call statistics summary"""
@@ -233,7 +233,7 @@ async def get_missed_calls(
     start_date: Optional[datetime] = Query(None),
     end_date: Optional[datetime] = Query(None),
     queue_id: Optional[str] = Query(None),
-    current_user: User = Depends(require_supervisor),
+    current_user: User = Depends(require_supervisor_or_admin),
     db: DatabaseManager = Depends(get_db)
 ):
     """Get missed calls"""

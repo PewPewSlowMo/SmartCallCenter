@@ -5,7 +5,7 @@ from models import (
     Queue, QueueCreate, QueueStats, StatsQuery, APIResponse, User
 )
 from database import DatabaseManager
-from auth import require_supervisor, require_admin
+from auth import require_supervisor_or_admin, require_admin
 
 # Import the get_db function from db
 import sys
@@ -35,7 +35,7 @@ async def create_queue(
 
 @router.get("/", response_model=List[Queue])
 async def get_queues(
-    current_user: User = Depends(require_supervisor),
+    current_user: User = Depends(require_supervisor_or_admin),
     db: DatabaseManager = Depends(get_db)
 ):
     """Get list of all active queues"""
@@ -45,7 +45,7 @@ async def get_queues(
 @router.get("/{queue_id}", response_model=Queue)
 async def get_queue(
     queue_id: str,
-    current_user: User = Depends(require_supervisor),
+    current_user: User = Depends(require_supervisor_or_admin),
     db: DatabaseManager = Depends(get_db)
 ):
     """Get queue by ID"""
@@ -63,7 +63,7 @@ async def get_queue_stats(
     start_date: Optional[str] = Query(None),
     end_date: Optional[str] = Query(None),
     queue_id: Optional[str] = Query(None),
-    current_user: User = Depends(require_supervisor),
+    current_user: User = Depends(require_supervisor_or_admin),
     db: DatabaseManager = Depends(get_db)
 ):
     """Get queue performance statistics"""
