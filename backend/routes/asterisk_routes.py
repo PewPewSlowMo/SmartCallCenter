@@ -311,66 +311,43 @@ async def originate_call(data: Dict[str, Any]):
         )
 
 @router.get("/extensions", response_model=List[Dict[str, Any]])
-async def get_asterisk_extensions(
-    db: DatabaseManager = Depends(get_db)
-):
-    """Получение списка extensions из Asterisk"""
+async def get_extensions():
+    """Получение списка extensions из Asterisk ARI"""
     try:
-        # Получаем настройки Asterisk
-        settings = await db.get_system_settings()
-        
-        if not settings or not settings.asterisk_config or not settings.asterisk_config.enabled:
-            return []
-        
-        # Проверяем, если это виртуальный ARI для тестирования
-        if settings.asterisk_config.host in ["demo.asterisk.com", "test.asterisk.local", "virtual.ari"]:
-            from virtual_asterisk_ari import get_virtual_ari
-            virtual_ari = get_virtual_ari()
-            
-            # Подключаемся к виртуальному ARI
-            await virtual_ari.connect(
-                settings.asterisk_config.host,
-                settings.asterisk_config.port,
-                settings.asterisk_config.username,
-                settings.asterisk_config.password
-            )
-            
-            # Получаем endpoints
-            endpoints = await virtual_ari.get_endpoints()
-            
-            return [
-                {
-                    "extension": endpoint["resource"],
-                    "technology": endpoint["technology"],
-                    "state": endpoint["state"],
-                    "contact_status": endpoint["contacts"][0]["contact_status"] if endpoint["contacts"] else "Unknown",
-                    "contact_uri": endpoint["contacts"][0]["uri"] if endpoint["contacts"] else "",
-                    "last_seen": datetime.utcnow().isoformat()
-                }
-                for endpoint in endpoints
-            ]
-        
-        # Реальное подключение к Asterisk ARI
         ari_client = await get_ari_client()
-        if not ari_client or not ari_client.connected:
+        
+        if not ari_client:
+            logger.warning("No ARI client available for extensions request")
             return []
         
-        endpoints = await ari_client.get_endpoints()
+        # Проверяем подключение
+        if not ari_client.connected:
+            logger.info("ARI client not connected, attempting to connect...")
+            connected = await ari_client.connect()
+            if not connected:
+                logger.error("Failed to connect ARI client for extensions request")
+                return []
         
-        return [
-            {
-                "extension": endpoint.get("resource", ""),
-                "technology": endpoint.get("technology", ""),
-                "state": endpoint.get("device_state", "UNKNOWN"),
-                "contact_status": endpoint.get("contacts", [{}])[0].get("contact_status", "Unknown"),
-                "contact_uri": endpoint.get("contacts", [{}])[0].get("uri", ""),
-                "last_seen": datetime.utcnow().isoformat()
-            }
-            for endpoint in endpoints
-        ]
+        # Получаем endpoints (которые представляют extensions)
+        endpoints = await ari_client.get_endpoints()
+        logger.info(f"Retrieved {len(endpoints)} endpoints/extensions from Asterisk ARI")
+        
+        # Преобразуем endpoints в extensions формат
+        extensions = []
+        for endpoint in endpoints:
+            extensions.append({
+                "extension": endpoint.get("resource", "unknown"),
+                "technology": endpoint.get("technology", "unknown"),
+                "state": endpoint.get("state", "unknown"),
+                "online": endpoint.get("state") in ["online", "available", "not_inuse"],
+                "channel_count": len(endpoint.get("channel_ids", [])),
+                "endpoint_data": endpoint  # Сохраняем оригинальные данные endpoint
+            })
+        
+        return extensions
         
     except Exception as e:
-        logger.error(f"Error getting Asterisk extensions: {e}")
+        logger.error(f"Error getting extensions: {e}")
         return []
 
 @router.get("/queues", response_model=List[Dict[str, Any]])
