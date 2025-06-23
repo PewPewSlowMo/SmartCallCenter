@@ -129,6 +129,15 @@ api_router.include_router(admin_router)
 api_router.include_router(dashboard_router)
 api_router.include_router(asterisk_router)
 
+# Include new routers
+from routes.setup_routes import router as setup_router
+from routes.notification_routes import router as notification_router
+from routes.crm_routes import router as crm_router
+
+api_router.include_router(setup_router)
+api_router.include_router(notification_router)
+api_router.include_router(crm_router)
+
 # Include WebSocket routes
 from routes.websocket_routes import router as websocket_router
 app.include_router(websocket_router)
