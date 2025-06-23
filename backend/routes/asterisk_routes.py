@@ -156,18 +156,30 @@ async def get_endpoints():
         ari_client = await get_ari_client()
         
         if not ari_client:
+            logger.warning("No ARI client available for endpoints request")
             return []
         
+        # Проверяем подключение и пытаемся переподключиться если нужно
+        if not ari_client.connected:
+            logger.info("ARI client not connected, attempting to connect...")
+            connected = await ari_client.connect()
+            if not connected:
+                logger.error("Failed to connect ARI client for endpoints request")
+                return []
+        
         endpoints = await ari_client.get_endpoints()
+        logger.info(f"Retrieved {len(endpoints)} endpoints from Asterisk ARI")
         
         # Форматирование данных endpoints
         formatted_endpoints = []
         for endpoint in endpoints:
             formatted_endpoints.append({
                 "technology": endpoint.get("technology"),
-                "resource": endpoint.get("resource"),
+                "resource": endpoint.get("resource"), 
                 "state": endpoint.get("state"),
-                "channel_ids": endpoint.get("channel_ids", [])
+                "channel_ids": endpoint.get("channel_ids", []),
+                "extension": endpoint.get("resource"),  # Добавляем extension для удобства
+                "online": endpoint.get("state") in ["online", "available", "not_inuse"]
             })
         
         return formatted_endpoints
