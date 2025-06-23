@@ -1,5 +1,15 @@
-from config import config
+import os
 import logging
+from pathlib import Path
+from dotenv import load_dotenv
+from datetime import datetime
+from typing import List
+
+# Load environment variables first
+ROOT_DIR = Path(__file__).parent
+load_dotenv(ROOT_DIR / '.env')
+
+from config import config
 
 # Настройка логирования
 logging.basicConfig(
@@ -40,9 +50,6 @@ from routes.queue_routes import router as queue_router
 from routes.admin_routes import router as admin_router
 from routes.dashboard_routes import router as dashboard_router
 from routes.asterisk_routes import router as asterisk_router
-
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
