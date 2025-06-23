@@ -74,9 +74,9 @@ async def login(
             detail="Authentication error"
         )
 
-@router.get("/me", response_model=UserResponse)
+@router.get("/me", response_model=User)
 async def get_current_user_info(
-    current_user: UserResponse = Depends(get_current_active_user)
+    current_user: User = Depends(get_current_active_user)
 ):
     """Get current authenticated user information"""
     return current_user
