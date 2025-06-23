@@ -292,7 +292,15 @@ class SystemSettingsUpdate(BaseModel):
     asterisk_config: Optional[AsteriskConfig] = None
     asterisk_database_config: Optional[AsteriskDatabaseConfig] = None
 
-# Statistics Models
+# ===== STATISTICS MODELS =====
+class StatsQuery(BaseModel):
+    period: str = "today"  # today, week, month, custom
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    group_id: Optional[str] = None
+    operator_id: Optional[str] = None
+    queue_name: Optional[str] = None
+
 class CallStats(BaseModel):
     total_calls: int = 0
     answered_calls: int = 0
@@ -300,9 +308,8 @@ class CallStats(BaseModel):
     abandoned_calls: int = 0
     avg_wait_time: float = 0.0
     avg_talk_time: float = 0.0
-    avg_hold_time: float = 0.0
-    service_level: float = 0.0  # % answered within threshold
-    answer_rate: float = 0.0
+    service_level: float = 0.0  # % calls answered within threshold
+    answer_rate: float = 0.0    # % calls answered vs total
 
 class OperatorStats(BaseModel):
     operator_id: str
@@ -311,11 +318,13 @@ class OperatorStats(BaseModel):
     total_calls: int = 0
     answered_calls: int = 0
     missed_calls: int = 0
+    offered_calls: int = 0      # НОВОЕ: предложенные звонки
     avg_talk_time: float = 0.0
     avg_hold_time: float = 0.0
     total_talk_time: int = 0
     efficiency: float = 0.0
-    online_time: int = 0
+    online_time: int = 0        # НОВОЕ: время онлайн
+    pause_time: int = 0         # НОВОЕ: время на паузе
 
 class QueueStats(BaseModel):
     queue_id: str
@@ -328,34 +337,37 @@ class QueueStats(BaseModel):
     avg_talk_time: float = 0.0
     service_level: float = 0.0
     answer_rate: float = 0.0
+    max_wait_time: float = 0.0
 
-# Response Models
+# ===== GROUP MODELS =====
+class Group(BaseModel):
+    id: str = Field(default_factory=generate_uuid)
+    name: str
+    description: Optional[str] = None
+    supervisor_id: Optional[str] = None
+    operator_ids: List[str] = []
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class GroupCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+    supervisor_id: Optional[str] = None
+
+class GroupUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    supervisor_id: Optional[str] = None
+    is_active: Optional[bool] = None
+
+# ===== API RESPONSE =====
 class APIResponse(BaseModel):
-    success: bool = True
-    message: str = "Operation completed successfully"
-    data: Optional[Any] = None
+    success: bool
+    message: str
+    data: Optional[Dict[str, Any]] = None
 
-class PaginatedResponse(BaseModel):
-    items: List[Any]
-    total: int
-    page: int
-    size: int
-    pages: int
-
-# Filters and Query Models
-class CallFilters(BaseModel):
-    start_date: Optional[datetime] = None
-    end_date: Optional[datetime] = None
-    status: Optional[CallStatus] = None
-    queue_id: Optional[str] = None
-    operator_id: Optional[str] = None
-    caller_number: Optional[str] = None
-    category: Optional[CallCategory] = None
-    
-class StatsQuery(BaseModel):
-    start_date: Optional[datetime] = None
-    end_date: Optional[datetime] = None
-    period: str = "today"  # today, yesterday, week, month, custom
-    group_id: Optional[str] = None
-    operator_id: Optional[str] = None
-    queue_id: Optional[str] = None
+# ===== TOKEN =====
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    user: User
