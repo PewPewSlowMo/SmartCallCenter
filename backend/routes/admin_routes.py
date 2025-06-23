@@ -532,32 +532,102 @@ async def get_system_info(
     db: DatabaseManager = Depends(get_db)
 ):
     """Get system information (admin only)"""
-    # Get counts of various entities
-    total_users = len(await db.get_users())
-    total_groups = len(await db.get_groups())
-    total_queues = len(await db.get_queues())
-    total_operators = len(await db.get_operators())
-    
-    # Get today's call count
-    from datetime import datetime, timedelta
-    today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
-    tomorrow = today + timedelta(days=1)
-    
-    today_calls = await db.calls.count_documents({
-        "start_time": {"$gte": today, "$lt": tomorrow}
-    })
-    
-    # Get system settings
-    settings = await db.get_system_settings()
-    
-    return {
-        "users": total_users,
-        "groups": total_groups,
-        "queues": total_queues,
-        "operators": total_operators,
-        "calls_today": today_calls,
-        "asterisk_connected": settings.asterisk_config.enabled if settings and settings.asterisk_config else False,
-        "database_connected": True,  # Always true if we can query
-        "api_version": "1.0.0",
-        "uptime": "Server running"  # Mock uptime
-    }
+    try:
+        # Get counts of various entities
+        total_users = len(await db.get_users())
+        total_groups = len(await db.get_groups())
+        total_queues = len(await db.get_queues())
+        total_operators = len(await db.get_operators())
+        
+        # Get today's call count
+        from datetime import datetime, timedelta
+        today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        tomorrow = today + timedelta(days=1)
+        
+        today_calls = await db.calls.count_documents({
+            "start_time": {"$gte": today, "$lt": tomorrow}
+        })
+        
+        # Get system settings and test connections
+        settings = await db.get_system_settings()
+        
+        # Test database connection
+        try:
+            await db.users.count_documents({})
+            database_connected = True
+            database_status = "Connected"
+        except Exception as e:
+            database_connected = False
+            database_status = f"Error: {str(e)}"
+        
+        # Test Asterisk connection
+        asterisk_connected = False
+        asterisk_status = "Not configured"
+        asterisk_info = {}
+        
+        if settings and settings.asterisk_config and settings.asterisk_config.enabled:
+            try:
+                from asterisk_client import AsteriskARIClient
+                test_client = AsteriskARIClient(
+                    host=settings.asterisk_config.host,
+                    port=settings.asterisk_config.port,
+                    username=settings.asterisk_config.username,
+                    password=settings.asterisk_config.password,
+                    use_ssl=settings.asterisk_config.protocol == "ARI_SSL"
+                )
+                
+                result = await test_client.test_connection()
+                await test_client.disconnect()
+                
+                asterisk_connected = result["success"]
+                asterisk_status = "Connected" if result["success"] else result.get("error", "Connection failed")
+                asterisk_info = {
+                    "version": result.get("asterisk_version"),
+                    "system": result.get("system"),
+                    "host": settings.asterisk_config.host,
+                    "port": settings.asterisk_config.port,
+                    "mode": result.get("mode", "Unknown")
+                }
+                
+            except Exception as e:
+                asterisk_status = f"Error: {str(e)}"
+                logger.error(f"Error testing Asterisk connection: {e}")
+        
+        # Get system uptime (mock for now)
+        import time
+        from datetime import datetime
+        
+        return {
+            "users": total_users,
+            "groups": total_groups,
+            "queues": total_queues,
+            "operators": total_operators,
+            "calls_today": today_calls,
+            "database": {
+                "connected": database_connected,
+                "status": database_status,
+                "name": os.environ.get('DB_NAME', 'callcenter')
+            },
+            "asterisk": {
+                "connected": asterisk_connected,
+                "status": asterisk_status,
+                "info": asterisk_info
+            },
+            "api": {
+                "connected": True,
+                "status": "Running",
+                "version": "1.0.0"
+            },
+            "system": {
+                "timestamp": datetime.utcnow().isoformat(),
+                "environment": os.environ.get('ENVIRONMENT', 'production'),
+                "uptime": "Server running"
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting system info: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error getting system information: {str(e)}"
+        )
