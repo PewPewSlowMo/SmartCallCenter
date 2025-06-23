@@ -129,6 +129,10 @@ api_router.include_router(admin_router)
 api_router.include_router(dashboard_router)
 api_router.include_router(asterisk_router)
 
+# Include WebSocket routes
+from routes.websocket_routes import router as websocket_router
+app.include_router(websocket_router)
+
 # Include the router in the main app
 app.include_router(api_router)
 
