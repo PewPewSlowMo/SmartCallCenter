@@ -221,22 +221,12 @@ class DatabaseManager:
             
         return await self.calls.count_documents(filter_query)
     
-    # Customer operations
-    async def create_customer(self, customer_data: CustomerCreate) -> Customer:
-        customer = Customer(**customer_data.dict())
-        await self.customers.insert_one(customer.dict())
-        return customer
-    
-    async def get_customer_by_phone(self, phone_number: str) -> Optional[Customer]:
-        customer_data = await self.customers.find_one({"phone_number": phone_number})
-        if customer_data:
-            return Customer(**customer_data)
-        return None
-    
-    async def update_customer(self, customer_id: str, updates: Dict[str, Any]) -> bool:
-        updates["updated_at"] = datetime.utcnow()
-        result = await self.customers.update_one({"id": customer_id}, {"$set": updates})
-        return result.modified_count > 0
+    # Group operations
+    async def get_groups(self) -> List[Group]:
+        """Get all groups"""
+        cursor = self.groups.find({})
+        groups = await cursor.to_list(None)
+        return [Group(**group) for group in groups]
     
     # Settings operations
     async def get_system_settings(self) -> Optional[SystemSettings]:
