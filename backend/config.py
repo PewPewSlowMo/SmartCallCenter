@@ -113,13 +113,14 @@ class Config:
             "password": cls.DEFAULT_ASTERISK_PASSWORD,
             "protocol": cls.DEFAULT_ASTERISK_PROTOCOL,
             "timeout": cls.ASTERISK_CONNECTION_TIMEOUT,
-            "enabled": True
+            "enabled": True,
+            "use_ssl": False
         }
     
     @classmethod
     def is_production(cls) -> bool:
         """Проверка продакшн режима"""
-        return cls.ENVIRONMENT.lower() == "production"
+        return cls.ENVIRONMENT.lower() == "production" or cls.PRODUCTION_MODE
     
     @classmethod
     def is_development(cls) -> bool:
