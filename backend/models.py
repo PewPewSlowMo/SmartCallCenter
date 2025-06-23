@@ -133,65 +133,96 @@ class OperatorUpdate(BaseModel):
     skills: Optional[List[str]] = None
     max_concurrent_calls: Optional[int] = None
 
-# Call Models
+# ===== CALL MODELS =====
 class Call(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    id: str = Field(default_factory=generate_uuid)
     caller_number: str
     called_number: Optional[str] = None
-    queue_id: str
     operator_id: Optional[str] = None
-    status: CallStatus
-    start_time: datetime = Field(default_factory=datetime.utcnow)
+    queue_name: Optional[str] = None
+    channel_id: Optional[str] = None
+    uniqueid: Optional[str] = None
+    
+    # Временные метки
+    start_time: datetime
     answer_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
-    wait_time: int = 0  # seconds
-    talk_time: int = 0  # seconds
-    hold_time: int = 0  # seconds
-    recording_url: Optional[str] = None
-    caller_region: Optional[str] = None
     
-    # Call details filled by operator
+    # Длительности (в секундах)
+    wait_time: Optional[int] = None      # время ожидания в очереди
+    ring_time: Optional[int] = None      # время звонка оператору
+    talk_time: Optional[int] = None      # время разговора
+    
+    # Статус и классификация
+    status: CallStatus
+    call_type: CallType = CallType.INCOMING_QUEUE
+    category: CallCategory = CallCategory.GENERAL
+    priority: CallPriority = CallPriority.NORMAL
+    
+    # Дополнительная информация
     description: Optional[str] = None
-    category: Optional[CallCategory] = None
-    priority: CallPriority = CallPriority.MEDIUM
     resolution: Optional[str] = None
-    follow_up_required: bool = False
-    customer_satisfaction: Optional[str] = None
     notes: Optional[str] = None
+    follow_up_required: bool = False
+    customer_satisfaction: Optional[int] = None  # 1-5
     
+    # Очередь
+    queue_position: Optional[int] = None
+    abandon_reason: Optional[str] = None
+    
+    # Метаданные
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
 class CallCreate(BaseModel):
     caller_number: str
     called_number: Optional[str] = None
-    queue_id: str
-    caller_region: Optional[str] = None
+    operator_id: Optional[str] = None
+    queue_name: Optional[str] = None
+    channel_id: Optional[str] = None
+    uniqueid: Optional[str] = None
+    start_time: datetime = Field(default_factory=datetime.utcnow)
+    status: CallStatus = CallStatus.RINGING
+    call_type: CallType = CallType.INCOMING_QUEUE
+    category: CallCategory = CallCategory.GENERAL
+    priority: CallPriority = CallPriority.NORMAL
+    queue_position: Optional[int] = None
 
 class CallUpdate(BaseModel):
     operator_id: Optional[str] = None
-    status: Optional[CallStatus] = None
     answer_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
     wait_time: Optional[int] = None
+    ring_time: Optional[int] = None
     talk_time: Optional[int] = None
-    hold_time: Optional[int] = None
-    description: Optional[str] = None
+    status: Optional[CallStatus] = None
     category: Optional[CallCategory] = None
     priority: Optional[CallPriority] = None
+    description: Optional[str] = None
     resolution: Optional[str] = None
-    follow_up_required: Optional[bool] = None
-    customer_satisfaction: Optional[str] = None
     notes: Optional[str] = None
+    follow_up_required: Optional[bool] = None
+    customer_satisfaction: Optional[int] = None
+    abandon_reason: Optional[str] = None
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
 
 class CallDetails(BaseModel):
-    description: str
-    category: CallCategory
-    priority: CallPriority = CallPriority.MEDIUM
+    description: Optional[str] = None
+    category: CallCategory = CallCategory.GENERAL
+    priority: CallPriority = CallPriority.NORMAL
     resolution: Optional[str] = None
     follow_up_required: bool = False
-    customer_satisfaction: Optional[str] = None
+    customer_satisfaction: Optional[int] = None
     notes: Optional[str] = None
+
+class CallFilters(BaseModel):
+    operator_id: Optional[str] = None
+    queue_name: Optional[str] = None
+    status: Optional[CallStatus] = None
+    call_type: Optional[CallType] = None
+    category: Optional[CallCategory] = None
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
 
 # Customer Models
 class Customer(BaseModel):
