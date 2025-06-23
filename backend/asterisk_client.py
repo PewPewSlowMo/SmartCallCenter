@@ -422,23 +422,35 @@ async def initialize_ari_client(config: Dict[str, Any]) -> bool:
     
     try:
         _ari_client = AsteriskARIClient(
-            host=config["host"],
-            port=config["port"],
-            username=config["username"],
-            password=config["password"],
-            use_ssl=config.get("use_ssl", False)
+            host=config.get("host"),
+            port=config.get("port"),
+            username=config.get("username"),
+            password=config.get("password"),
+            use_ssl=config.get("use_ssl", False),
+            app_name="SmartCallCenter"
         )
         
-        success = await _ari_client.connect()
-        if success:
-            # Запуск WebSocket в фоновом режиме
-            asyncio.create_task(_ari_client.start_websocket_listener())
-            logger.info("ARI client initialized and WebSocket started")
+        # Подключение к Asterisk
+        connected = await _ari_client.connect()
         
-        return success
-        
+        if connected:
+            logger.info("✅ ARI client connected successfully")
+            
+            # Инициализируем обработчик событий для real-time звонков
+            try:
+                from asterisk_event_handler import initialize_event_handler
+                await initialize_event_handler(_ari_client)
+                logger.info("✅ Asterisk event handler initialized")
+            except Exception as e:
+                logger.error(f"Failed to initialize event handler: {e}")
+            
+            return True
+        else:
+            logger.error("❌ Failed to connect ARI client")
+            return False
+            
     except Exception as e:
-        logger.error(f"Failed to initialize ARI client: {e}")
+        logger.error(f"Error initializing ARI client: {e}")
         return False
 
 async def shutdown_ari_client():
