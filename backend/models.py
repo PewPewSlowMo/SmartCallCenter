@@ -360,6 +360,27 @@ class GroupUpdate(BaseModel):
     supervisor_id: Optional[str] = None
     is_active: Optional[bool] = None
 
+# ===== RESPONSE MODELS =====
+class UserResponse(BaseModel):
+    """User response model (без пароля)"""
+    id: str
+    username: str
+    email: EmailStr
+    name: str
+    role: UserRole
+    is_active: bool
+    group_id: Optional[str] = None
+    created_at: datetime
+    last_login: Optional[datetime] = None
+
+class PaginatedResponse(BaseModel):
+    """Paginated response model"""
+    items: List[Any]
+    total: int
+    page: int
+    page_size: int
+    total_pages: int
+
 # ===== API RESPONSE =====
 class APIResponse(BaseModel):
     success: bool
