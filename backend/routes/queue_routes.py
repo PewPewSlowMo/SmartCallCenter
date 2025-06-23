@@ -5,7 +5,7 @@ from models import (
     Queue, QueueCreate, QueueStats, StatsQuery, APIResponse, User
 )
 from database import DatabaseManager
-from auth import require_supervisor_or_admin, require_admin
+from auth import require_supervisor_or_admin, require_admin, require_role
 
 # Import the get_db function from db
 import sys
