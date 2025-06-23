@@ -6,7 +6,6 @@ from datetime import datetime
 from models import UserLogin, UserResponse, APIResponse
 from database import DatabaseManager
 from auth import (
-    authenticate_user, 
     create_access_token, 
     get_password_hash, 
     verify_password,
