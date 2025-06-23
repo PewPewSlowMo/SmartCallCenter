@@ -51,50 +51,54 @@ class OperatorStatus(str, Enum):
     PAUSED = "paused"
     IN_CALL = "in_call"
 
-# Legacy models for backward compatibility
-class StatusCheck(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+# ===== ASTERISK DATABASE CONFIG =====
+class AsteriskDatabaseConfig(BaseModel):
+    """Конфигурация подключения к БД Asterisk"""
+    host: str = "localhost"
+    port: int = 3306
+    username: str = "asterisk"
+    password: str = "password"
+    database: str = "asteriskcdrdb"
+    db_type: str = "mysql"  # mysql или postgresql
+    enabled: bool = False
+    ssl_mode: str = "disabled"
+    charset: str = "utf8mb4"
+    connection_timeout: int = 30
+    pool_size: int = 10
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
-
-# User Models
+# ===== USER MODELS =====
 class User(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    id: str = Field(default_factory=generate_uuid)
     username: str
-    email: str
+    email: EmailStr
     name: str
     password_hash: str
     role: UserRole
-    group_id: Optional[str] = None
     is_active: bool = True
+    group_id: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    last_login: Optional[datetime] = None
 
 class UserCreate(BaseModel):
     username: str
-    email: str
+    email: EmailStr
     name: str
     password: str
     role: UserRole
     group_id: Optional[str] = None
-    extension: Optional[str] = None  # Для операторов
+
+class UserUpdate(BaseModel):
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+    name: Optional[str] = None
+    password: Optional[str] = None
+    role: Optional[UserRole] = None
+    group_id: Optional[str] = None
+    is_active: Optional[bool] = None
 
 class UserLogin(BaseModel):
     username: str
     password: str
-
-class UserResponse(BaseModel):
-    id: str
-    username: str
-    email: str
-    name: str
-    role: UserRole
-    group_id: Optional[str] = None
-    is_active: bool
-    created_at: datetime
 
 # Group Models
 class Group(BaseModel):
