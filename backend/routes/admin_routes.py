@@ -416,113 +416,285 @@ async def update_system_settings(
     
     return settings
 
-@router.post("/settings/asterisk/test", response_model=APIResponse)
-async def test_asterisk_connection(
-    asterisk_config: AsteriskConfig,
+from typing import Dict, Any
+from auth import require_manager_or_admin
+from models import StatsQuery
+
+@router.get("/settings/asterisk-database", response_model=Dict[str, Any])
+async def get_asterisk_database_settings(
     current_user: User = Depends(require_admin),
     db: DatabaseManager = Depends(get_db)
 ):
-    """Test Asterisk connection (admin only)"""
-    from asterisk_client import AsteriskARIClient
-    
+    """Получение настроек БД Asterisk"""
     try:
-        logger.info(f"🔌 Тестирование Asterisk: {asterisk_config.host}:{asterisk_config.port}")
+        settings = await db.get_system_settings()
         
-        # Validate required parameters
-        if not asterisk_config.host or not asterisk_config.username:
-            logger.error("❌ Отсутствуют обязательные параметры подключения")
-            return APIResponse(
-                success=False,
-                message="Отсутствуют обязательные параметры подключения",
-                data={
-                    "error": "Missing required connection parameters",
-                    "required_fields": ["host", "username"],
-                    "provided": {
-                        "host": bool(asterisk_config.host),
-                        "username": bool(asterisk_config.username),
-                        "port": asterisk_config.port
-                    }
-                }
-            )
-        
-        # Create temporary ARI client for testing
-        ari_client = AsteriskARIClient(
-            host=asterisk_config.host,
-            port=asterisk_config.port,
-            username=asterisk_config.username,
-            password=asterisk_config.password
-        )
-        
-        # Test the connection
-        result = await ari_client.test_connection()
-        
-        # Clean up
-        await ari_client.disconnect()
-        
-        logger.info(f"📡 Результат тестирования: {result.get('success', False)}")
-        
-        if result["success"]:
-            return APIResponse(
-                success=True,
-                message=f"Успешное подключение к Asterisk {result.get('asterisk_version', 'Unknown version')}",
-                data={
-                    "asterisk_version": result.get('asterisk_version'),
-                    "system": result.get('system'),
-                    "connection_details": {
-                        "host": asterisk_config.host,
-                        "port": asterisk_config.port,
-                        "protocol": asterisk_config.protocol,
-                        "status": "Connected"
-                    }
-                }
-            )
+        if settings and settings.asterisk_database_config:
+            config = settings.asterisk_database_config
+            # Скрываем пароль в ответе
+            return {
+                "enabled": config.enabled,
+                "host": config.host,
+                "port": config.port,
+                "username": config.username,
+                "password": "***" if config.password else "",
+                "database": config.database,
+                "db_type": config.db_type,
+                "ssl_mode": config.ssl_mode,
+                "charset": config.charset,
+                "connection_timeout": config.connection_timeout,
+                "pool_size": config.pool_size
+            }
         else:
-            error_message = result.get('error', 'Unknown error')
-            error_details = result.get('details', {})
+            # Настройки по умолчанию
+            return {
+                "enabled": False,
+                "host": "localhost",
+                "port": 3306,
+                "username": "asterisk",
+                "password": "",
+                "database": "asteriskcdrdb",
+                "db_type": "mysql",
+                "ssl_mode": "disabled",
+                "charset": "utf8mb4",
+                "connection_timeout": 30,
+                "pool_size": 10
+            }
             
-            logger.warning(f"⚠️ Ошибка подключения: {error_message}")
-            
+    except Exception as e:
+        logger.error(f"Error getting asterisk database settings: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
+@router.post("/settings/asterisk-database", response_model=APIResponse)
+async def update_asterisk_database_settings(
+    config_data: Dict[str, Any],
+    current_user: User = Depends(require_admin),
+    db: DatabaseManager = Depends(get_db)
+):
+    """Обновление настроек БД Asterisk"""
+    try:
+        # Валидируем данные
+        from models import AsteriskDatabaseConfig
+        asterisk_db_config = AsteriskDatabaseConfig(**config_data)
+        
+        # Получаем текущие настройки
+        settings = await db.get_system_settings()
+        
+        if settings:
+            # Обновляем существующие настройки
+            update_data = SystemSettingsUpdate(
+                asterisk_database_config=asterisk_db_config
+            )
+            success = await db.update_system_settings(update_data, current_user.id)
+        else:
+            # Создаем новые настройки
+            new_settings = SystemSettings(
+                asterisk_database_config=asterisk_db_config,
+                updated_by=current_user.id
+            )
+            success = await db.create_system_settings(new_settings)
+        
+        if success:
+            # Если настройки включены, инициализируем подключение
+            if asterisk_db_config.enabled:
+                try:
+                    from asterisk_database import initialize_asterisk_db
+                    connection_success = await initialize_asterisk_db(asterisk_db_config)
+                    
+                    if connection_success:
+                        return APIResponse(
+                            success=True,
+                            message="Настройки БД Asterisk сохранены и подключение установлено",
+                            data={"connected": True}
+                        )
+                    else:
+                        return APIResponse(
+                            success=True,
+                            message="Настройки сохранены, но подключение к БД не удалось установить",
+                            data={"connected": False}
+                        )
+                except Exception as e:
+                    logger.error(f"Error initializing Asterisk DB: {e}")
+                    return APIResponse(
+                        success=True,
+                        message=f"Настройки сохранены, ошибка подключения: {str(e)}",
+                        data={"connected": False, "error": str(e)}
+                    )
+            else:
+                return APIResponse(
+                    success=True,
+                    message="Настройки БД Asterisk сохранены (отключено)"
+                )
+        else:
             return APIResponse(
                 success=False,
-                message=error_message,
-                data={
-                    "error": error_message,
-                    "details": error_details,
-                    "connection_attempt": {
-                        "host": asterisk_config.host,
-                        "port": asterisk_config.port,
-                        "username": asterisk_config.username,
-                        "protocol": asterisk_config.protocol
-                    },
-                    "troubleshooting": [
-                        "Проверьте доступность Asterisk сервера",
-                        "Убедитесь в корректности учетных данных", 
-                        "Проверьте настройки брандмауэра",
-                        "Для локальных IP: убедитесь что Asterisk запущен"
-                    ]
-                }
+                message="Ошибка сохранения настроек"
             )
             
     except Exception as e:
-        error_message = f"Критическая ошибка тестирования: {str(e)}"
-        logger.error(f"💥 {error_message}")
+        logger.error(f"Error updating asterisk database settings: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
+@router.post("/settings/asterisk-database/test", response_model=APIResponse)
+async def test_asterisk_database_connection(
+    config_data: Dict[str, Any],
+    current_user: User = Depends(require_admin)
+):
+    """Тестирование подключения к БД Asterisk"""
+    try:
+        from models import AsteriskDatabaseConfig
+        from asterisk_database import AsteriskDatabaseManager
         
+        # Создаем конфигурацию из данных
+        config = AsteriskDatabaseConfig(**config_data)
+        
+        # Тестируем подключение
+        db_manager = AsteriskDatabaseManager(config)
+        test_result = await db_manager.test_connection()
+        
+        await db_manager.close()
+        
+        if test_result["success"]:
+            return APIResponse(
+                success=True,
+                message="Подключение к БД Asterisk успешно",
+                data=test_result
+            )
+        else:
+            return APIResponse(
+                success=False,
+                message=f"Ошибка подключения: {test_result['error']}",
+                data=test_result
+            )
+            
+    except Exception as e:
+        logger.error(f"Error testing asterisk database connection: {e}")
         return APIResponse(
             success=False,
-            message=error_message,
-            data={
-                "error": str(e),
-                "error_type": type(e).__name__,
-                "connection_attempt": {
-                    "host": asterisk_config.host,
-                    "port": asterisk_config.port,
-                    "username": asterisk_config.username
-                },
-                "system_info": {
-                    "timestamp": datetime.utcnow().isoformat(),
-                    "server": "Smart Call Center Backend"
+            message=f"Ошибка тестирования подключения: {str(e)}"
+        )
+
+@router.get("/reports/cdr-data", response_model=Dict[str, Any])
+async def get_cdr_data(
+    start_date: str = None,
+    end_date: str = None,
+    limit: int = 100,
+    current_user: User = Depends(require_manager_or_admin),
+    db: DatabaseManager = Depends(get_db)
+):
+    """Получение CDR данных из БД Asterisk"""
+    try:
+        from asterisk_database import get_asterisk_db_manager
+        from datetime import datetime, timedelta
+        
+        asterisk_db = get_asterisk_db_manager()
+        
+        if not asterisk_db or not asterisk_db.connected:
+            return {
+                "success": False,
+                "message": "БД Asterisk не подключена",
+                "data": []
+            }
+        
+        # Парсим даты
+        if start_date:
+            start_dt = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+        else:
+            start_dt = datetime.utcnow() - timedelta(days=7)
+            
+        if end_date:
+            end_dt = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+        else:
+            end_dt = datetime.utcnow()
+        
+        # Получаем CDR данные
+        cdr_data = await asterisk_db.get_cdr_data(start_dt, end_dt, limit)
+        
+        # Получаем статистику
+        statistics = await asterisk_db.get_call_statistics(
+            (end_dt - start_dt).days or 1
+        )
+        
+        return {
+            "success": True,
+            "data": {
+                "cdr_records": cdr_data,
+                "statistics": statistics,
+                "period": {
+                    "start_date": start_dt.isoformat(),
+                    "end_date": end_dt.isoformat(),
+                    "total_records": len(cdr_data)
                 }
             }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting CDR data: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
+@router.get("/reports/hybrid-statistics", response_model=Dict[str, Any])
+async def get_hybrid_statistics(
+    period: str = "today",
+    current_user: User = Depends(require_manager_or_admin),
+    db: DatabaseManager = Depends(get_db)
+):
+    """Получение гибридной статистики (наша БД + CDR)"""
+    try:
+        from asterisk_database import get_asterisk_db_manager
+        from datetime import datetime, timedelta
+        
+        # Получаем статистику из нашей БД
+        query = StatsQuery(period=period)
+        our_stats = await db.get_call_stats(query)
+        
+        # Получаем статистику из CDR
+        asterisk_stats = {}
+        asterisk_db = get_asterisk_db_manager()
+        
+        if asterisk_db and asterisk_db.connected:
+            try:
+                period_days = 1 if period == "today" else 7
+                asterisk_stats = await asterisk_db.get_call_statistics(period_days)
+            except Exception as e:
+                logger.error(f"Error getting Asterisk statistics: {e}")
+                asterisk_stats = {"error": str(e)}
+        
+        return {
+            "success": True,
+            "data": {
+                "smartcallcenter_stats": {
+                    "total_calls": our_stats.total_calls,
+                    "answered_calls": our_stats.answered_calls,
+                    "missed_calls": our_stats.missed_calls,
+                    "abandoned_calls": our_stats.abandoned_calls,
+                    "avg_wait_time": our_stats.avg_wait_time,
+                    "avg_talk_time": our_stats.avg_talk_time,
+                    "service_level": our_stats.service_level,
+                    "answer_rate": our_stats.answer_rate
+                },
+                "asterisk_cdr_stats": asterisk_stats,
+                "period": period,
+                "comparison": {
+                    "data_sources": ["SmartCallCenter DB", "Asterisk CDR"],
+                    "sync_status": "active" if asterisk_db and asterisk_db.connected else "disconnected"
+                }
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting hybrid statistics: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
         )
 
 # System Information
