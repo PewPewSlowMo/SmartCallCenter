@@ -224,38 +224,51 @@ class CallFilters(BaseModel):
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
 
-# Customer Models
-class Customer(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    phone_number: str
-    name: Optional[str] = None
-    email: Optional[str] = None
-    is_vip: bool = False
-    region: Optional[str] = None
-    notes: Optional[str] = None
+# ===== QUEUE MODELS =====
+class Queue(BaseModel):
+    id: str = Field(default_factory=generate_uuid)
+    name: str
+    description: Optional[str] = None
+    strategy: str = "leastrecent"  # leastrecent, fewestcalls, linear, etc.
+    max_wait_time: int = 300  # секунды
+    priority: int = 1
+    music_on_hold: Optional[str] = None
+    announce_frequency: int = 60
+    announce_position: bool = True
+    operator_ids: List[str] = []
+    is_active: bool = True
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
 
-class CustomerCreate(BaseModel):
-    phone_number: str
+class QueueCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+    strategy: str = "leastrecent"
+    max_wait_time: int = 300
+    priority: int = 1
+    operator_ids: List[str] = []
+
+class QueueUpdate(BaseModel):
     name: Optional[str] = None
-    email: Optional[str] = None
-    is_vip: bool = False
-    region: Optional[str] = None
-    notes: Optional[str] = None
+    description: Optional[str] = None
+    strategy: Optional[str] = None
+    max_wait_time: Optional[int] = None
+    priority: Optional[int] = None
+    operator_ids: Optional[List[str]] = None
+    is_active: Optional[bool] = None
 
-# System Settings Models
+# ===== ASTERISK CONFIG =====
 class AsteriskConfig(BaseModel):
-    host: str
-    port: int = 5038
-    username: str
-    password: str
-    protocol: str = "AMI"
+    host: str = "localhost"
+    port: int = 8088
+    username: str = "asterisk"
+    password: str = "asterisk"
+    protocol: str = "ARI"
     timeout: int = 30
-    enabled: bool = False
+    enabled: bool = True
+    use_ssl: bool = False
 
+# ===== SYSTEM SETTINGS =====
 class SystemSettings(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     call_recording: bool = True
     auto_answer_delay: int = 3
     max_call_duration: int = 3600
@@ -264,8 +277,9 @@ class SystemSettings(BaseModel):
     sms_notifications: bool = False
     email_notifications: bool = True
     asterisk_config: Optional[AsteriskConfig] = None
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    asterisk_database_config: Optional[AsteriskDatabaseConfig] = None
     updated_by: str
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
 
 class SystemSettingsUpdate(BaseModel):
     call_recording: Optional[bool] = None
@@ -276,6 +290,7 @@ class SystemSettingsUpdate(BaseModel):
     sms_notifications: Optional[bool] = None
     email_notifications: Optional[bool] = None
     asterisk_config: Optional[AsteriskConfig] = None
+    asterisk_database_config: Optional[AsteriskDatabaseConfig] = None
 
 # Statistics Models
 class CallStats(BaseModel):
