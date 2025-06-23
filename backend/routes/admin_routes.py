@@ -205,6 +205,7 @@ async def get_user_operator_info(
             "last_activity": operator.last_activity
         }
     return None
+@router.delete("/users/{user_id}", response_model=APIResponse)
 async def delete_user(
     user_id: str,
     current_user: User = Depends(require_admin),
@@ -224,6 +225,12 @@ async def delete_user(
             detail="User not found"
         )
     
+    # Delete associated operator if exists
+    operator = await db.get_operator_by_user_id(user_id)
+    if operator:
+        await db.operators.delete_one({"user_id": user_id})
+    
+    # Delete user
     success = await db.delete_user(user_id)
     if not success:
         raise HTTPException(
@@ -235,6 +242,108 @@ async def delete_user(
         success=True,
         message="User deleted successfully"
     )
+
+@router.put("/users/{user_id}/operator", response_model=APIResponse)
+async def update_user_operator_info(
+    user_id: str,
+    operator_updates: dict,
+    current_user: User = Depends(require_admin),
+    db: DatabaseManager = Depends(get_db)
+):
+    """Update operator information for a user (admin only)"""
+    user = await db.get_user_by_id(user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    operator = await db.get_operator_by_user_id(user_id)
+    if not operator:
+        # Create operator if doesn't exist and user is operator role
+        if user.role == UserRole.OPERATOR and "extension" in operator_updates:
+            operator_data = OperatorCreate(
+                user_id=user_id,
+                extension=operator_updates.get("extension"),
+                group_id=operator_updates.get("group_id"),
+                skills=operator_updates.get("skills", ["general"]),
+                max_concurrent_calls=operator_updates.get("max_concurrent_calls", 1)
+            )
+            await db.create_operator(operator_data)
+            return APIResponse(success=True, message="Operator created successfully")
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Operator not found"
+            )
+    
+    # Update operator
+    update_dict = {k: v for k, v in operator_updates.items() if v is not None}
+    update_dict["last_activity"] = datetime.utcnow()
+    
+    result = await db.operators.update_one(
+        {"user_id": user_id},
+        {"$set": update_dict}
+    )
+    
+    if result.modified_count > 0:
+        return APIResponse(success=True, message="Operator updated successfully")
+    else:
+        return APIResponse(success=False, message="No changes made to operator")
+
+@router.get("/asterisk/connection-status", response_model=dict)
+async def get_asterisk_connection_status(
+    current_user: User = Depends(require_admin),
+    db: DatabaseManager = Depends(get_db)
+):
+    """Get real-time Asterisk connection status"""
+    try:
+        settings = await db.get_system_settings()
+        
+        if not settings or not settings.asterisk_config:
+            return {
+                "connected": False,
+                "status": "Not configured",
+                "last_check": datetime.utcnow().isoformat(),
+                "config": None
+            }
+        
+        # Test connection
+        from asterisk_client import AsteriskARIClient
+        test_client = AsteriskARIClient(
+            host=settings.asterisk_config.host,
+            port=settings.asterisk_config.port,
+            username=settings.asterisk_config.username,
+            password=settings.asterisk_config.password,
+            use_ssl=settings.asterisk_config.protocol == "ARI_SSL"
+        )
+        
+        result = await test_client.test_connection()
+        await test_client.disconnect()
+        
+        return {
+            "connected": result["success"],
+            "status": "Connected" if result["success"] else result.get("error", "Connection failed"),
+            "asterisk_version": result.get("asterisk_version"),
+            "system": result.get("system"),
+            "last_check": datetime.utcnow().isoformat(),
+            "config": {
+                "host": settings.asterisk_config.host,
+                "port": settings.asterisk_config.port,
+                "protocol": settings.asterisk_config.protocol,
+                "enabled": settings.asterisk_config.enabled
+            },
+            "mode": result.get("mode", "Unknown")
+        }
+        
+    except Exception as e:
+        logger.error(f"Error checking Asterisk connection status: {e}")
+        return {
+            "connected": False,
+            "status": f"Error: {str(e)}",
+            "last_check": datetime.utcnow().isoformat(),
+            "error": str(e)
+        }
 
 # Group Management
 @router.post("/groups", response_model=Group)
