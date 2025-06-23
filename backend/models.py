@@ -1,10 +1,13 @@
-from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+from pydantic import BaseModel, EmailStr, Field
+from typing import Optional, List, Dict, Any, Union
 from datetime import datetime
 from enum import Enum
 import uuid
 
-# Enums for fixed values
+def generate_uuid():
+    return str(uuid.uuid4())
+
+# ===== ENUMS =====
 class UserRole(str, Enum):
     ADMIN = "admin"
     MANAGER = "manager"
@@ -12,30 +15,41 @@ class UserRole(str, Enum):
     OPERATOR = "operator"
 
 class CallStatus(str, Enum):
-    ANSWERED = "answered"
-    MISSED = "missed"
-    ABANDONED = "abandoned"
-    BUSY = "busy"
+    WAITING = "waiting"        # В очереди ожидания
+    RINGING = "ringing"        # Звонит оператору
+    ANSWERED = "answered"      # Отвечен оператором
+    COMPLETED = "completed"    # Завершен
+    MISSED = "missed"          # Пропущен
+    ABANDONED = "abandoned"    # Брошен звонящим
+    TRANSFERRED = "transferred" # Переведен
+    FAILED = "failed"          # Ошибка
 
-class OperatorStatus(str, Enum):
-    ONLINE = "online"
-    BUSY = "busy"
-    BREAK = "break"
-    OFFLINE = "offline"
+class CallType(str, Enum):
+    INCOMING_QUEUE = "incoming_queue"    # Входящий в очередь
+    INCOMING_DIRECT = "incoming_direct"  # Входящий напрямую
+    OUTGOING = "outgoing"               # Исходящий
+    INTERNAL = "internal"               # Внутренний
+
+class CallCategory(str, Enum):
+    GENERAL = "general"
+    TECHNICAL = "technical"
+    SALES = "sales"
+    SUPPORT = "support"
+    COMPLAINT = "complaint"
+    VIP = "vip"
 
 class CallPriority(str, Enum):
     LOW = "low"
-    MEDIUM = "medium"
+    NORMAL = "normal"
     HIGH = "high"
     URGENT = "urgent"
 
-class CallCategory(str, Enum):
-    SUPPORT = "support"
-    SALES = "sales"
-    COMPLAINT = "complaint"
-    INFO = "info"
-    BILLING = "billing"
-    OTHER = "other"
+class OperatorStatus(str, Enum):
+    OFFLINE = "offline"
+    AVAILABLE = "available"
+    BUSY = "busy"
+    PAUSED = "paused"
+    IN_CALL = "in_call"
 
 # Legacy models for backward compatibility
 class StatusCheck(BaseModel):
