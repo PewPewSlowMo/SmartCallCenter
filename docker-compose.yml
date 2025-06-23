@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: smart-call-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: smartcall2025
+      MONGO_INITDB_DATABASE: callcenter
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - smart-call-network
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: smart-call-backend
+    restart: always
+    ports:
+      - "8001:8001"
+    environment:
+      - MONGO_URL=mongodb://admin:smartcall2025@mongodb:27017/callcenter?authSource=admin
+      - DB_NAME=callcenter
+      - JWT_SECRET_KEY=smart-call-center-secret-key-2025-national-hospital-denis
+    depends_on:
+      - mongodb
+    networks:
+      - smart-call-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: smart-call-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:8001
+    depends_on:
+      - backend
+    networks:
+      - smart-call-network
+
+volumes:
+  mongo_data:
+    driver: local
+
+networks:
+  smart-call-network:
+    driver: bridge
