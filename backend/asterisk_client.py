@@ -208,47 +208,97 @@ class AsteriskARIClient:
         return state_mapping.get(asterisk_state, "offline")
     
     # API Methods
-    async def get_channels(self) -> List[Dict[str, Any]]:
-        """Получение списка активных каналов"""
-        if not self.session:
-            return []
-        
-        try:
-            async with self.session.get(f"{self.base_url}/channels") as resp:
-                if resp.status == 200:
-                    return await resp.json()
-                return []
-        except Exception as e:
-            logger.error(f"Error getting channels: {e}")
-            return []
-    
     async def get_endpoints(self) -> List[Dict[str, Any]]:
-        """Получение списка endpoints (SIP/PJSIP устройств)"""
-        if not self.session:
-            return []
-        
+        """Получение всех endpoints из Asterisk"""
         try:
+            if not self.session:
+                await self.connect()
+            
+            if not self.session:
+                logger.error("No session available for endpoints request")
+                return []
+            
             async with self.session.get(f"{self.base_url}/endpoints") as resp:
                 if resp.status == 200:
-                    return await resp.json()
-                return []
+                    endpoints = await resp.json()
+                    logger.info(f"Retrieved {len(endpoints)} endpoints from Asterisk")
+                    return endpoints
+                else:
+                    logger.error(f"Failed to get endpoints: HTTP {resp.status}: {await resp.text()}")
+                    return []
+                    
         except Exception as e:
             logger.error(f"Error getting endpoints: {e}")
             return []
     
     async def get_device_states(self) -> List[Dict[str, Any]]:
-        """Получение состояний устройств"""
-        if not self.session:
-            return []
-        
+        """Получение состояний устройств из Asterisk"""
         try:
+            if not self.session:
+                await self.connect()
+            
+            if not self.session:
+                logger.error("No session available for device states request")
+                return []
+            
             async with self.session.get(f"{self.base_url}/deviceStates") as resp:
                 if resp.status == 200:
-                    return await resp.json()
-                return []
+                    device_states = await resp.json()
+                    logger.info(f"Retrieved {len(device_states)} device states from Asterisk")
+                    return device_states
+                else:
+                    logger.error(f"Failed to get device states: HTTP {resp.status}: {await resp.text()}")
+                    return []
+                    
         except Exception as e:
             logger.error(f"Error getting device states: {e}")
             return []
+    
+    async def get_channels(self) -> List[Dict[str, Any]]:
+        """Получение активных каналов из Asterisk"""
+        try:
+            if not self.session:
+                await self.connect()
+            
+            if not self.session:
+                logger.error("No session available for channels request")
+                return []
+            
+            async with self.session.get(f"{self.base_url}/channels") as resp:
+                if resp.status == 200:
+                    channels = await resp.json()
+                    logger.info(f"Retrieved {len(channels)} active channels from Asterisk")
+                    return channels
+                else:
+                    logger.error(f"Failed to get channels: HTTP {resp.status}: {await resp.text()}")
+                    return []
+                    
+        except Exception as e:
+            logger.error(f"Error getting channels: {e}")
+            return []
+    
+    async def get_asterisk_info(self) -> Dict[str, Any]:
+        """Получение информации о системе Asterisk"""
+        try:
+            if not self.session:
+                await self.connect()
+            
+            if not self.session:
+                logger.error("No session available for asterisk info request")
+                return {}
+            
+            async with self.session.get(f"{self.base_url}/asterisk/info") as resp:
+                if resp.status == 200:
+                    info = await resp.json()
+                    logger.info("Retrieved Asterisk system information")
+                    return info
+                else:
+                    logger.error(f"Failed to get asterisk info: HTTP {resp.status}: {await resp.text()}")
+                    return {}
+                    
+        except Exception as e:
+            logger.error(f"Error getting asterisk info: {e}")
+            return {}
     
     async def originate_call(self, extension: str, context: str = "internal", 
                            priority: int = 1, timeout: int = 30) -> bool:
