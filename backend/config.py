@@ -46,16 +46,20 @@ class Config:
     
     # ===== ASTERISK =====
     
-    # Asterisk по умолчанию (можно изменить через UI)
-    DEFAULT_ASTERISK_HOST: str = os.getenv("DEFAULT_ASTERISK_HOST", "demo.asterisk.com")
+    # Продакшн Asterisk настройки
+    DEFAULT_ASTERISK_HOST: str = os.getenv("DEFAULT_ASTERISK_HOST", "92.46.62.34")
     DEFAULT_ASTERISK_PORT: int = int(os.getenv("DEFAULT_ASTERISK_PORT", "8088"))
-    DEFAULT_ASTERISK_USERNAME: str = os.getenv("DEFAULT_ASTERISK_USERNAME", "asterisk")
-    DEFAULT_ASTERISK_PASSWORD: str = os.getenv("DEFAULT_ASTERISK_PASSWORD", "asterisk")
+    DEFAULT_ASTERISK_USERNAME: str = os.getenv("DEFAULT_ASTERISK_USERNAME", "smart-call-center")
+    DEFAULT_ASTERISK_PASSWORD: str = os.getenv("DEFAULT_ASTERISK_PASSWORD", "Almaty20252025")
     DEFAULT_ASTERISK_PROTOCOL: str = os.getenv("DEFAULT_ASTERISK_PROTOCOL", "ARI")
     
     # Таймауты
     ASTERISK_CONNECTION_TIMEOUT: int = int(os.getenv("ASTERISK_CONNECTION_TIMEOUT", "30"))
     ASTERISK_RETRY_ATTEMPTS: int = int(os.getenv("ASTERISK_RETRY_ATTEMPTS", "3"))
+    
+    # Продакшн режим
+    PRODUCTION_MODE: bool = os.getenv("PRODUCTION_MODE", "True").lower() == "true"
+    DISABLE_VIRTUAL_ARI: bool = os.getenv("DISABLE_VIRTUAL_ARI", "True").lower() == "true"
     
     # ===== ЛОГИРОВАНИЕ =====
     
