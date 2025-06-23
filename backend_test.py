@@ -885,7 +885,7 @@ def test_websocket_connection():
             return False
             
         token = auth_tokens["admin"]
-        ws_url = f"{BACKEND_URL.replace('https://', 'wss://')}/ws/connect?token={token}"
+        ws_url = f"ws://localhost:8001/ws/connect?token={token}"
         
         # Define WebSocket callbacks
         def on_message(ws, message):
