@@ -381,6 +381,10 @@ class PaginatedResponse(BaseModel):
     page_size: int
     total_pages: int
 
+class StatusCheckCreate(BaseModel):
+    """Status check create request"""
+    message: str
+
 class StatusCheck(BaseModel):
     """Status check response"""
     status: str
