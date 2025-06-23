@@ -100,56 +100,38 @@ class UserLogin(BaseModel):
     username: str
     password: str
 
-# Group Models
-class Group(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    name: str
-    description: Optional[str] = None
-    supervisor_id: Optional[str] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-
-class GroupCreate(BaseModel):
-    name: str
-    description: Optional[str] = None
-    supervisor_id: Optional[str] = None
-
-# Queue Models
-class Queue(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    name: str
-    description: Optional[str] = None
-    max_wait_time: int = 300  # seconds
-    priority: int = 1
-    is_active: bool = True
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-
-class QueueCreate(BaseModel):
-    name: str
-    description: Optional[str] = None
-    max_wait_time: int = 300
-    priority: int = 1
-
-# Operator Models
+# ===== OPERATOR MODELS =====
 class Operator(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    id: str = Field(default_factory=generate_uuid)
     user_id: str
-    extension: Optional[str] = None
+    extension: str
     status: OperatorStatus = OperatorStatus.OFFLINE
     group_id: Optional[str] = None
-    skills: List[str] = []
+    skills: List[str] = ["general"]
     max_concurrent_calls: int = 1
     current_calls: int = 0
     last_activity: datetime = Field(default_factory=datetime.utcnow)
+    
+    # Статистика работы
+    total_login_time: int = 0  # секунды
+    pause_time: int = 0        # секунды на паузе
+    calls_offered: int = 0     # предложенные звонки
+    calls_answered: int = 0    # отвеченные звонки
+    calls_missed: int = 0      # пропущенные звонки
 
 class OperatorCreate(BaseModel):
     user_id: str
-    extension: Optional[str] = None
+    extension: str
     group_id: Optional[str] = None
-    skills: List[str] = []
+    skills: List[str] = ["general"]
     max_concurrent_calls: int = 1
 
-class OperatorStatusUpdate(BaseModel):
-    status: OperatorStatus
+class OperatorUpdate(BaseModel):
+    extension: Optional[str] = None
+    status: Optional[OperatorStatus] = None
+    group_id: Optional[str] = None
+    skills: Optional[List[str]] = None
+    max_concurrent_calls: Optional[int] = None
 
 # Call Models
 class Call(BaseModel):
