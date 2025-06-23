@@ -60,21 +60,11 @@ async def login(
             data={"sub": user.username}, expires_delta=access_token_expires
         )
         
-        return {
-            "access_token": access_token,
-            "token_type": "bearer",
-            "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-            "user": {
-                "id": user.id,
-                "username": user.username,
-                "email": user.email,
-                "name": user.name,
-                "role": user.role,
-                "group_id": user.group_id,
-                "is_active": user.is_active,
-                "created_at": user.created_at.isoformat()
-            }
-        }
+        return Token(
+            access_token=access_token,
+            token_type="bearer",
+            user=user
+        )
     
     except HTTPException:
         raise
