@@ -8,7 +8,7 @@ from models import (
     User, UserRole
 )
 from database import DatabaseManager
-from auth import get_current_active_user, require_role("operator"), require_supervisor_or_admin
+from auth import get_current_active_user, require_supervisor_or_admin, require_role
 
 # Import the get_db function from db
 import sys
