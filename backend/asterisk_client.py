@@ -316,8 +316,12 @@ class AsteriskARIClient:
     async def test_connection(self) -> Dict[str, Any]:
         """Тестирование подключения к Asterisk"""
         try:
-            # Если включен режим тестирования, используем виртуальный ARI
-            if self.host in ["demo.asterisk.com", "test.asterisk.local", "virtual.ari"]:
+            # В продакшн режиме отключаем виртуальный ARI
+            from config import config
+            if config.DISABLE_VIRTUAL_ARI and config.is_production():
+                logger.info("🚀 Продакшн режим: подключение к реальному Asterisk")
+            elif self.host in ["demo.asterisk.com", "test.asterisk.local", "virtual.ari"] and not config.is_production():
+                # Только в режиме разработки используем виртуальный ARI
                 from virtual_asterisk_ari import get_virtual_ari
                 virtual_ari = get_virtual_ari()
                 result = await virtual_ari.connect(self.host, self.port, self.username, self.password)
@@ -337,7 +341,10 @@ class AsteriskARIClient:
                         "success": True,
                         "asterisk_version": info.get("version"),
                         "system": info.get("system"),
-                        "status": "Connected"
+                        "status": "Connected",
+                        "host": self.host,
+                        "port": self.port,
+                        "mode": "Production" if config.is_production() else "Development"
                     }
                 else:
                     return {
