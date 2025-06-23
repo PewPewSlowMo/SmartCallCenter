@@ -142,6 +142,8 @@ class Config:
         print(f"Token Expire: {cls.ACCESS_TOKEN_EXPIRE_MINUTES} min")
         print(f"CORS Origins: {cls.CORS_ORIGINS}")
         print(f"Asterisk Host: {cls.DEFAULT_ASTERISK_HOST}:{cls.DEFAULT_ASTERISK_PORT}")
+        print(f"Production Mode: {cls.PRODUCTION_MODE}")
+        print(f"Virtual ARI Disabled: {cls.DISABLE_VIRTUAL_ARI}")
         print(f"Log Level: {cls.LOG_LEVEL}")
         print(f"Docker Mode: {cls.DOCKER_MODE}")
         print("=" * 50)
