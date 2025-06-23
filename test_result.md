@@ -347,135 +347,324 @@ backend:
 
   - task: "GET /api/health endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Endpoint needs to be tested."
+      - working: true
+        agent: "testing"
+        comment: "Endpoint returns health status correctly with 200 status code. Database connection is verified and timestamp is included."
 
   - task: "POST /api/auth/login endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/routes/auth_routes.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Endpoint needs to be tested with demo users."
+      - working: true
+        agent: "testing"
+        comment: "Successfully authenticated with admin/admin credentials. Endpoint returns JWT token, token type, and user information."
 
   - task: "GET /api/auth/me endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/routes/auth_routes.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Endpoint needs to be tested with JWT token."
+      - working: true
+        agent: "testing"
+        comment: "Endpoint correctly returns user information when provided with a valid JWT token."
 
   - task: "GET /api/dashboard/stats endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/routes/dashboard_routes.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Endpoint needs to be tested."
+      - working: true
+        agent: "testing"
+        comment: "Endpoint returns dashboard statistics correctly with call_stats, operator_stats, queue_stats, and period information."
 
   - task: "GET /api/dashboard/realtime endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/routes/dashboard_routes.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Endpoint needs to be tested."
+      - working: true
+        agent: "testing"
+        comment: "Endpoint returns real-time dashboard data including timestamp, asterisk data, current activity, today's summary, and operators information."
 
   - task: "GET /api/admin/users endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/routes/admin_routes.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Endpoint needs to be tested with admin token."
+      - working: true
+        agent: "testing"
+        comment: "Endpoint returns list of users correctly. Access is properly restricted to admin role only."
 
   - task: "GET /api/admin/groups endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/routes/admin_routes.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Endpoint needs to be tested with admin token."
+      - working: true
+        agent: "testing"
+        comment: "Endpoint returns list of groups correctly. Access is properly restricted to admin role only."
 
   - task: "GET /api/admin/settings endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/routes/admin_routes.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Endpoint needs to be tested with admin token."
+      - working: true
+        agent: "testing"
+        comment: "Endpoint returns system settings correctly. Access is properly restricted to admin role only."
 
   - task: "GET /api/admin/system/info endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/routes/admin_routes.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Endpoint needs to be tested with admin token."
+      - working: true
+        agent: "testing"
+        comment: "Endpoint returns system information correctly including users, groups, queues, operators, database, asterisk, api, and system data. Access is properly restricted to admin role only."
 
   - task: "GET /api/operators/ endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/routes/operator_routes.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Endpoint needs to be tested."
+      - working: true
+        agent: "testing"
+        comment: "Endpoint returns list of operators correctly. Access is properly restricted to admin, manager, and supervisor roles."
 
   - task: "GET /api/queues/ endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/routes/queue_routes.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Endpoint needs to be tested."
+      - working: true
+        agent: "testing"
+        comment: "Endpoint returns list of queues correctly. Access is properly restricted to admin, manager, and supervisor roles."
+
+  - task: "GET /api/dashboard/analytics/hourly endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/dashboard_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Endpoint returns hourly analytics data correctly including date, hourly_data, total_calls, total_answered, and avg_answer_rate. Access is properly restricted to admin and manager roles."
+
+  - task: "GET /api/dashboard/analytics/operator-performance endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/dashboard_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Endpoint returns operator performance data correctly including period, operators, and summary information. Access is properly restricted to admin, manager, and supervisor roles."
+
+  - task: "GET /api/dashboard/analytics/queue-performance endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/dashboard_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Endpoint returns queue performance data correctly including period, queues, and summary information. Access is properly restricted to admin and manager roles."
+
+  - task: "POST /api/setup/asterisk/scan endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/setup_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Endpoint successfully scans Asterisk configuration and returns success, asterisk_info, discovered data, statistics, and recommendations. Access is properly restricted to admin role only."
+
+  - task: "POST /api/setup/operators/migrate endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/setup_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Endpoint successfully migrates operators from Asterisk extensions and returns success, message, and data with created, skipped, and error information. Access is properly restricted to admin role only."
+
+  - task: "POST /api/setup/queues/create endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/setup_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Endpoint successfully creates queues from Asterisk data and returns success, message, and data with created, skipped, and summary information. Access is properly restricted to admin role only."
+
+  - task: "POST /api/setup/complete endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/setup_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Endpoint successfully completes setup wizard and returns success, message, and data with setup_completed, timestamp, and next_steps information. Access is properly restricted to admin role only."
+
+  - task: "GET /api/notifications/settings endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/notification_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Endpoint returns notification settings correctly including success, settings, and version_info. Access is available to all authenticated users."
+
+  - task: "GET /api/crm/info endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/crm_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Endpoint returns CRM information correctly including status, current_version, description, planned_features, and roadmap. Access is available to all authenticated users."
+
+  - task: "GET /api/crm/demo endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/crm_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Endpoint returns CRM demo data correctly including demo_mode, message, and available_in information. Access is properly restricted to admin role only."
+
+  - task: "PUT /api/admin/users/{user_id}/operator endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/admin_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Endpoint successfully updates operator information and returns success and message. Access is properly restricted to admin role only."
+
+  - task: "GET /api/admin/asterisk/connection-status endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/admin_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Endpoint returns Asterisk connection status correctly including connected, status, last_check, and config information. Access is properly restricted to admin role only."
+
+  - task: "WebSocket connection /ws/connect"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/websocket_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "WebSocket connection works correctly. Successfully connected, received initial data, and exchanged ping/pong messages. Authentication with JWT token works properly."
 
   - task: "MongoDB connection"
     implemented: true
