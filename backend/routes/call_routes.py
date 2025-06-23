@@ -8,7 +8,7 @@ from models import (
     User, UserRole
 )
 from database import DatabaseManager
-from auth import get_current_active_user, require_operator, require_supervisor
+from auth import get_current_active_user, require_role("operator"), require_supervisor
 
 # Import the get_db function from db
 import sys
@@ -72,7 +72,7 @@ async def get_my_calls(
     limit: int = Query(100, ge=1, le=1000),
     start_date: Optional[datetime] = Query(None),
     end_date: Optional[datetime] = Query(None),
-    current_user: User = Depends(require_operator),
+    current_user: User = Depends(require_role("operator")),
     db: DatabaseManager = Depends(get_db)
 ):
     """Get calls for the current operator"""
@@ -122,7 +122,7 @@ async def get_call(
 async def update_call(
     call_id: str,
     call_update: CallUpdate,
-    current_user: User = Depends(require_operator),
+    current_user: User = Depends(require_role("operator")),
     db: DatabaseManager = Depends(get_db)
 ):
     """Update a call record"""
@@ -156,7 +156,7 @@ async def update_call(
 async def save_call_details(
     call_id: str,
     call_details: CallDetails,
-    current_user: User = Depends(require_operator),
+    current_user: User = Depends(require_role("operator")),
     db: DatabaseManager = Depends(get_db)
 ):
     """Save call details after call completion"""
