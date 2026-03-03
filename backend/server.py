@@ -27,9 +27,9 @@ logger = logging.getLogger(__name__)
 if config.DEBUG or config.ENVIRONMENT == "development":
     config.print_config()
 else:
-    logger.info(f"🚀 Smart Call Center {config.ENVIRONMENT.upper()} mode started")
-    logger.info(f"📡 Connecting to Asterisk: {config.DEFAULT_ASTERISK_HOST}:{config.DEFAULT_ASTERISK_PORT}")
-    logger.info(f"🗄️  Database: {config.DB_NAME}")
+    logger.info(f"Smart Call Center {config.ENVIRONMENT.upper()} mode started")
+    logger.info(f"Connecting to Asterisk: {config.DEFAULT_ASTERISK_HOST}:{config.DEFAULT_ASTERISK_PORT}")
+    logger.info(f"Database: {config.DB_NAME}")
 
 from fastapi import FastAPI, APIRouter, Depends
 from fastapi.middleware.cors import CORSMiddleware
