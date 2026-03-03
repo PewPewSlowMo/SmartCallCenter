@@ -1,6 +1,6 @@
-# 📡 Smart Call Center - API Reference
+# Smart Call Center - API Reference
 
-## 📋 Содержание
+## Содержание
 1. [Обзор API](#обзор-api)
 2. [Авторизация](#авторизация)
 3. [Модели данных](#модели-данных)
@@ -11,7 +11,7 @@
 
 ---
 
-## 🔍 Обзор API
+## Обзор API
 
 ### Базовая информация
 - **Base URL**: `{BACKEND_URL}/api`
@@ -39,7 +39,7 @@ Accept: application/json
 
 ---
 
-## 🔐 Авторизация
+## Авторизация
 
 ### Получение токена
 
@@ -123,7 +123,7 @@ Authorization: Bearer {access_token}
 
 ---
 
-## 📊 Модели данных
+## Модели данных
 
 ### User
 ```typescript
@@ -218,7 +218,7 @@ interface SystemSettings {
 
 ---
 
-## 🛣️ Endpoints
+## Endpoints
 
 ### Авторизация (`/api/auth/`)
 
@@ -859,7 +859,7 @@ interface SystemSettings {
 
 ---
 
-## 🔌 WebSocket Events
+## WebSocket Events
 
 ### Подключение
 ```javascript
@@ -946,7 +946,7 @@ ws.send(JSON.stringify({
 
 ---
 
-## ❌ Коды ошибок
+## Коды ошибок
 
 ### HTTP статусы
 - **200** - Успешный запрос
@@ -1012,7 +1012,7 @@ ws.send(JSON.stringify({
 
 ---
 
-## 📝 Примеры использования
+## Примеры использования
 
 ### JavaScript/TypeScript
 
